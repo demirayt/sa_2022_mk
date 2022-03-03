@@ -1,0 +1,41 @@
+VERSION=1
+%-------------------------------------------------------------------------- 
+definitions:
+%--------------------------------------------------------------------------
+baseclass=TSMController
+controllertype=PREF
+%--------------------------------------------------------------------------
+dynamic_states dPOref={initial=1,unit="",description="dynamic state",display=false}
+%--------------------------------------------------------------------------
+inputs P={initial=1,unit="",description="active power",display=true}
+inputs VQ={initial=0,unit="",description="imaginary-part of positive sequence voltage",display=true}
+%--------------------------------------------------------------------------
+external_states POREF={initial=1,unit="",description="active power reference",display=true}
+%--------------------------------------------------------------------------
+parameters LFTYPE={initial=0,unit="integer",description="",display=false}
+parameters Psetpoint={initial=1,unit="",description="",display=false}
+parameters VQsetpoint={initial=0,unit="",description="",display=false}
+parameters PSTEP={initial=0,unit="",description="",display=true}
+%--------------------------------------------------------------------------
+initializations:
+%--------------------------------------------------------------------------
+ 
+%--------------------------------------------------------------------------
+f_equations:
+%-------------------------------------------------------------------------- 
+if t < 0
+	if (LFTYPE==3)
+		dt(dPOref) = (VQ - VQsetpoint)
+	else
+		dt(dPOref) = (P - Psetpoint)
+	end
+else
+    dt(dPOref) = 0;
+end
+%-------------------------------------------------------------------------- 
+g_equations:
+%--------------------------------------------------------------------------
+g1= POREF - ( dPOref + PSTEP )
+%--------------------------------------------------------------------------
+h_equations:
+%--------------------------------------------------------------------------

@@ -1,0 +1,44 @@
+%----------------------- 
+definitions:
+%-----------------------
+dynamic_states ROTORANGLE=7.853981633974483e-001 dwr=1 dEq1=1 dEd1 dPsi1d=1 dPsi2q
+inputs VD1=1 VQ1 VT=1 TMECH=1 EFD=1
+external_states ID1 IQ1 W=1 P1=1 Q1
+internal_states Vd_r=0.2 Vq_r=1.0 Id_r Iq_r=0.8 psid psiq IFD=1 TELEC=1 PMECH=1 
+internal_states VRD=1 VRQ IRD=-1 IRQ 
+parameters SN=100 UN=10 SR=5 UR=3.3 ws=3.141592653589793e+002
+parameters Ra Xd Xd1 Tdo1 Xq Xl H KD LFTYPE
+%-----------------------
+initializations:
+%----------------------- 
+
+%-----------------------
+f_equations:
+%----------------------- 
+dt(ROTORANGLE)= ws*(dwr-1);
+dt(dwr)= 1/(2*H)*(TMECH - TELEC - KD*ws*(dwr-1));
+dt(dEq1) = 1/(Tdo1)*(-dEq1 - (Xd - Xd1)*Id_r + EFD);
+%----------------------- 
+g_equations:
+%-----------------------
+g00a = VD1*UN - VRD*UR
+g00b = VQ1*UN - VRQ*UR
+g00c = ID1*SN/UN + IRD*SR/UR
+g00d = IQ1*SN/UN + IRQ*SR/UR
+%-----------------------
+g05 =  Ra*Id_r + psiq + Vd_r;
+g06 =  Ra*Iq_r - psid + Vq_r;
+g07 =  -psid + (Xd2 - Xl)/(Xd1 - Xl)*dEq1 + (Xd1-Xd2)/(Xd1-Xl)*dPsi1d;
+g08 =  -psiq - Xq2*Iq_r - (Xq2 - Xl)/(Xq1 - Xl)*dEd1 + (Xq1-Xq2)/(Xq1-Xl)*dPsi2q;
+g09 =  Vd_r*sin(ROTORANGLE) + Vq_r*cos(ROTORANGLE) - VRD;
+g10 =  Vq_r*sin(ROTORANGLE) - Vd_r*cos(ROTORANGLE) - VRQ;
+g11 =  Id_r*sin(ROTORANGLE) + Iq_r*cos(ROTORANGLE) - IRD;
+g12 =  Iq_r*sin(ROTORANGLE) - Id_r*cos(ROTORANGLE) - IRQ;
+g13 =  W - dwr;
+g14 = (Xd1 - Xl)*IFD - dEq1 + (Xd-Xd1)/(Xd-Xl)*(Xl*Id_r +psid);
+g15 = TELEC - psid*Iq_r + psiq*Id_r;
+g16 = P1 - (VRD*IRD+VRQ*IRQ)
+g17 = Q1 - (VRQ*IRD-VRD*IRQ)
+g20 = (TMECH*W - PMECH)
+%-----------------------
+h_equations:

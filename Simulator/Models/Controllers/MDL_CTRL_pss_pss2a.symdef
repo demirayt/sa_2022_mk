@@ -1,0 +1,240 @@
+VERSION=1
+%-------------------------------------------------------------------------- 
+definitions:
+%--------------------------------------------------------------------------
+baseclass=TSMController
+controllertype=PSS
+%--------------------------------------------------------------------------
+dynamic_states dVT={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states dV1={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states dV2={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states dV3={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states dV4={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states dV5={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states dV6={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states dV11={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states dV12={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states dVN1={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states dVN2={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states dVN3={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states dVN4={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states dVN5={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states dVN7={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states dVN8={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states dVN9={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states dVN10={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states dVN11={initial=0,unit="",description="dynamic state",display=false}
+%--------------------------------------------------------------------------
+inputs W={initial=1,unit="rad/s",description="rotor angular speed",display=true}
+inputs P={initial=1,unit="",description="active power",display=true}
+inputs PMECH={initial=1,unit="",description="active power",display=true}
+inputs VT={initial=1,unit="",description="terminal voltage",display=true}
+inputs IFD={initial=1,unit="",description="field current",display=true}
+inputs ID={initial=1,unit="",description="real-part of positive sequence current",display=true}
+inputs IQ={initial=1,unit="",description="imaginary-part of positive sequence current",display=true}
+%--------------------------------------------------------------------------
+external_states VPSS={initial=0,unit="",description="PSS ouptut",display=true}
+%--------------------------------------------------------------------------
+internal_states derVT={initial=0,unit="",description="internal state",display=false}
+internal_states VIN1={initial=1,unit="",description="internal state",display=false}
+internal_states VIN2={initial=1,unit="",description="internal state",display=false}
+internal_states V1={initial=0,unit="",description="internal state",display=false}
+internal_states V2={initial=0,unit="",description="internal state",display=false}
+internal_states V3={initial=0,unit="",description="internal state",display=false}
+internal_states V4={initial=0,unit="",description="internal state",display=false}
+internal_states V5={initial=0,unit="",description="internal state",display=false}
+internal_states V6={initial=0,unit="",description="internal state",display=false}
+internal_states V7={initial=0,unit="",description="internal state",display=false}
+internal_states V8={initial=0,unit="",description="internal state",display=false}
+internal_states V9={initial=0,unit="",description="internal state",display=false}
+internal_states V10={initial=0,unit="",description="internal state",display=false}
+internal_states V11={initial=0,unit="",description="internal state",display=false}
+internal_states V12={initial=0,unit="",description="internal state",display=false}
+internal_states VN1={initial=0,unit="",description="internal state",display=false}
+internal_states VN2={initial=0,unit="",description="internal state",display=false}
+internal_states VN3={initial=0,unit="",description="internal state",display=false}
+internal_states VN4={initial=0,unit="",description="internal state",display=false}
+internal_states VN5={initial=0,unit="",description="internal state",display=false}
+internal_states VN6={initial=0,unit="",description="internal state",display=false}
+internal_states VN7={initial=0,unit="",description="internal state",display=false}
+internal_states VN8={initial=0,unit="",description="internal state",display=false}
+internal_states VN9={initial=0,unit="",description="internal state",display=false}
+internal_states VN10={initial=0,unit="",description="internal state",display=false}
+internal_states VN11={initial=0,unit="",description="internal state",display=false}
+internal_states IBranch={initial=1,unit="",description="internal state",display=false}
+%--------------------------------------------------------------------------
+parameters TW1={initial=1,unit="s",description="",display=true}
+parameters TW2={initial=1,unit="s",description="",display=true}
+parameters TW3={initial=1,unit="s",description="",display=true}
+parameters TW4={initial=1,unit="s",description="",display=true}
+parameters TW6={initial=2,unit="s",description="",display=true}
+parameters KS2={initial=1,unit="",description="",display=true}
+parameters TW7={initial=2,unit="s",description="",display=true}
+parameters KS3={initial=2,unit="",description="",display=true}
+parameters KS1={initial=1,unit="",description="",display=true}
+parameters T1={initial=3,unit="s",description="",display=true}
+parameters T2={initial=4,unit="s",description="",display=true}
+parameters T3={initial=1,unit="s",description="",display=true}
+parameters T4={initial=1,unit="s",description="",display=true}
+parameters VSTMIN={initial=-10,unit="",description="",display=true}
+parameters VSTMAX={initial=10,unit="",description="",display=true}
+parameters M={initial=1,unit="integer",description="",display=true}
+parameters N={initial=1,unit="integer",description="",display=true}
+parameters T8={initial=1,unit="s",description="",display=true}
+parameters T9={initial=2,unit="s",description="",display=true}
+parameters SWS1={initial=1,unit="enum",description="input signal 1 switch",display=true}
+parameters SWS2={initial=1,unit="enum",description="input signal 2 switch",display=true}
+%--------------------------------------------------------------------------
+initializations:
+%--------------------------------------------------------------------------
+ 
+%--------------------------------------------------------------------------
+f_equations:
+%-------------------------------------------------------------------------- 
+
+%-------------------------------------------------------------------------- 
+g_equations:
+%--------------------------------------------------------------------------
+g01 = derVT - lag(VT,dVT,1,1,none,none)
+g011 = IBranch^2 - (ID^2+IQ^2)
+%-----------------------
+if SWS1 == 1
+    g02 = VIN1 - (W-1)
+else
+    if SWS1 == 2 
+			%-- in CIM the busFrequency is selected, we are using the rotor speed (W) instead of it
+       g02 = VIN1 - W 
+    else
+        if SWS1 == 3
+				%-- in CIM the busFrequency Deviation is selected, we are using the rotor speed deviation (W-1) instead of it
+            g02 = VIN1 - P 
+        else
+            if SWS1 == 4 
+					%-- Active Power (P), i.e. Generator Electrical Power
+                g02 = VIN1 - PMECH 
+			else
+				if SWS1 == 5
+					g02 = VIN1 - VT
+				else
+					g02 = VIN1 - derVT
+				end			
+            end
+        end
+    end
+end         
+
+%-----------------------
+if SWS2 == 1
+    g03 = VIN2 - (W-1)
+else
+    if SWS2 == 2 
+			%-- in CIM the busFrequency is selected, we are using the rotor speed (W) instead of it
+       g03 = VIN2 - W 
+    else
+        if SWS2 == 3
+				%-- in CIM the busFrequency Deviation is selected, we are using the rotor speed deviation (W-1) instead of it
+            g03 = VIN2 - P 
+        else
+            if SWS2 == 4 
+					%-- Active Power (P), i.e. Generator Electrical Power
+                g03 = VIN2 - PMECH 
+			else
+				if SWS2 == 5
+					g03 = VIN2 - VT
+				else
+					g03 = VIN2 - derVT
+				end			
+            end
+        end
+    end
+end         
+%-----------------------
+g04 = V1 - derlag(VIN1,dV1,1,TW1,none,none)
+g05 = V2 - derlag(V1,dV2,1,TW2,none,none)
+g06 = V3 - derlag(VIN2,dV3,1,TW3,none,none)
+g07 = V4 - derlag(V3,dV4,1,TW4,none,none)
+%-----------------------
+g08 = V5 - lag(V2,dV5,1.0,TW6,none,none)
+g09 = V6 - lag(V4,dV6,KS2,TW7,none,none)
+%----------------------- 
+g10 = V7 - (V6*KS3+V5)
+%-----------------------
+g11 = VN1 - leadlag(V7,dVN1,1.0,T8,T9,none,none)
+g12 = VN2 - lag(VN1,dVN2,1.0,T9,none,none)
+g13 = VN3 - lag(VN2,dVN3,1.0,T9,none,none)
+g14 = VN4 - lag(VN3,dVN4,1.0,T9,none,none)
+g15 = VN5 - lag(VN4,dVN5,1.0,T9,none,none) 
+g17 = VN7 - leadlag(VN6,dVN7,1.0,T8,T9,none,none)
+g18 = VN8 - lag(VN7,dVN8,1.0,T9,none,none)
+g19 = VN9 - lag(VN8,dVN9,1.0,T9,none,none)
+g20 = VN10 - lag(VN9,dVN10,1.0,T9,none,none)
+g21 = VN11 - lag(VN10,dVN11,1.0,T9,none,none)
+
+if M==0 && N==0
+	g16 = VN6 - 1
+	g22 = V8 - V7
+	else
+if M==1
+	g16 = VN6 - VN1
+	if N==1
+		g22 = V8 - VN1
+	else
+		g22 = V8 - VN7
+	end
+else
+	if M==2
+		g16 = VN6 - VN2
+		if N=1 
+			g22 = V8 - VN2
+		else
+			g22 = V8 - VN8
+		end
+	else
+		if M==3
+			g16 = VN6 - VN3
+			if N==1 
+				g22 = V8 - VN3
+			else
+				g22 = V8 - VN9
+			end
+		else
+			if M==4
+				g16 = VN6 - VN4
+				if N==1 
+					g22 = V8 - VN4
+				else
+					g22 = V8 - VN10
+				end
+			else
+				g16 = VN6 - VN5
+				if N==1 
+					g22 = V8 - VN5
+				else
+					g22 = V8 - VN11
+				end
+			end
+		end
+	end
+end	
+end
+%-----------------------
+g23 = V9 - (V8-V6)
+%-----------------------
+g24 = V10 - (KS1*V9)
+%-----------------------
+g25 = V11 - leadlag(V10,dV11,1.0,T1,T2,none,none)
+%-----------------------
+g26 = V12 - leadlag(V11,dV12,1.0,T3,T4,none,none)
+%-----------------------
+g27 = VPSS - limit(V12,VSTMIN,VSTMAX,1)
+%--------------------------------------------------------------------------
+h_equations:
+%--------------------------------------------------------------------------
+
+%--------------------------------------------------------------------------
+checklimits:
+%--------------------------------------------------------------------------
+
+%--------------------------------------------------------------------------
+checkparameters:
+%--------------------------------------------------------------------------

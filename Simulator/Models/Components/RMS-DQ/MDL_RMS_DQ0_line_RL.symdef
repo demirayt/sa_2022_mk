@@ -1,0 +1,23 @@
+class branch
+%----------------------- 
+definitions:
+%-----------------------
+inputs VD1=1 VQ1 VD2=1 VQ2
+external_states ID1 IQ1 ID2 IQ2
+parameters SIDE1_ON=1 R X
+%-----------------------
+initializations:
+%----------------------- 
+%-----------------------
+f_equations:
+%----------------------- 
+%----------------------- 
+g_equations:
+%-----------------------
+g1= SIDE1_ON*(VD1-VD2-(ID1*R-IQ1*X)) + (1-SIDE1_ON)*ID1
+g2= SIDE1_ON*(VQ1-VQ2-(ID1*X+IQ1*R)) + (1-SIDE1_ON)*IQ1
+g3= ID2 + ID1
+g4= IQ2 + IQ1
+%-----------------------
+h_equations:
+%-----------------------

@@ -1,0 +1,39 @@
+VERSION=1
+%-------------------------------------------------------------------------- 
+definitions:
+%--------------------------------------------------------------------------
+dynamic_states dIQCMD={initial=1,unit="",description="dynamic state",display=false}
+%--------------------------------------------------------------------------
+inputs Q={initial=0,unit="",description="input",display=true}
+inputs VT={initial=1,unit="",description="input",display=true}
+%--------------------------------------------------------------------------
+external_states IQCMD={initial=0.1,unit="",description="current source controlling reactive power",display=true}
+%--------------------------------------------------------------------------
+parameters LFTYPE={initial=1,unit="",description="set point",display=true}
+parameters Vsetpoint={initial=1,unit="",description="set point",display=true}
+parameters Qsetpoint={initial=0,unit="",description="set point",display=true}
+parameters K={initial=1,unit="",description="set point",display=true}
+%--------------------------------------------------------------------------
+initializations:
+%--------------------------------------------------------------------------
+ 
+%--------------------------------------------------------------------------
+f_equations:
+%-------------------------------------------------------------------------- 
+if t < 0
+	if (LFTYPE==3 || LFTYPE==2)
+		dt(dIQCMD) = (VT - Vsetpoint)
+	else
+		dt(dIQCMD) = (Q - Qsetpoint)
+	end
+else
+    dt(dIQCMD) = 0;
+end
+
+%-------------------------------------------------------------------------- 
+g_equations:
+%--------------------------------------------------------------------------
+g1 = IQCMD - K*dIQCMD
+%--------------------------------------------------------------------------
+h_equations:
+%--------------------------------------------------------------------------

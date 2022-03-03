@@ -1,0 +1,40 @@
+VERSION=1
+%-------------------------------------------------------------------------- 
+definitions:
+%-------------------------------------------------------------------------- 
+baseclass=TSMController
+controllertype=VREF
+%--------------------------------------------------------------------------
+dynamic_states dVref={initial=1,unit="pu",description="dynamic state",display=false}
+%--------------------------------------------------------------------------
+inputs VT={initial=1,unit="pu",description="terminal voltage",display=true}
+inputs Q={initial=0,unit="pu",description="reactive power",display=true}
+%--------------------------------------------------------------------------
+external_states VREF={initial=1,unit="pu",description="reference voltage",display=true}
+%--------------------------------------------------------------------------
+parameters LFTYPE={initial=0,unit="integer",description="",display=false}
+parameters Vsetpoint={initial=1,unit="",description="",display=false}
+parameters Qsetpoint={initial=0,unit="",description="",display=false}
+parameters VSTEP={initial=0,unit="",description="",display=true}
+%--------------------------------------------------------------------------
+initializations:
+%-------------------------------------------------------------------------- 
+
+%--------------------------------------------------------------------------
+f_equations:
+%-------------------------------------------------------------------------- 
+if t < 0
+	if (LFTYPE==3 || LFTYPE==2)
+		dt(dVref) = (VT - Vsetpoint)
+	else
+		dt(dVref) = (Q - Qsetpoint)
+	end
+else
+    dt(dVref) = 0;
+end
+%-------------------------------------------------------------------------- 
+g_equations:
+%--------------------------------------------------------------------------
+g1= VREF - ( dVref + VSTEP )
+%--------------------------------------------------------------------------
+h_equations:

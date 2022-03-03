@@ -1,0 +1,99 @@
+VERSION=1
+%-------------------------------------------------------------------------- 
+definitions:
+%--------------------------------------------------------------------------
+baseclass=TSMController
+controllertype=AVR
+%--------------------------------------------------------------------------
+dynamic_states dV1={initial=1,unit="",description="dynamic state",display=false}
+dynamic_states dVR={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states ddEFD={initial=1,unit="",description="dynamic state",display=false}
+dynamic_states dVF={initial=0,unit="",description="dynamic state",display=false}
+%--------------------------------------------------------------------------
+inputs VC={initial=1,unit="",description="controlled voltage",display=true}
+inputs VPSS={initial=0,unit="",description="input from PSS",display=true}
+inputs VUEL={initial=-999,unit="",description="input from vuel",display=true}
+inputs VOEL={initial=999,unit="",description="input from voel",display=true}
+inputs VREF={initial=1,unit="",description="reference voltage",display=true}
+%--------------------------------------------------------------------------
+external_states EFD={initial=1,unit="",description="exciter voltage",display=true}
+%--------------------------------------------------------------------------
+internal_states VS={initial=0,unit="",description="internal state",display=false}
+internal_states V1={initial=1,unit="",description="internal state",display=false}
+internal_states V2={initial=1,unit="",description="internal state",display=false}
+internal_states VR={initial=0,unit="",description="internal state",display=false}
+internal_states V3={initial=1,unit="",description="internal state",display=false}
+internal_states dEFD={initial=1,unit="",description="internal state",display=false}
+internal_states VF={initial=0,unit="",description="internal state",display=false}
+internal_states VX={initial=0,unit="",description="internal state",display=false}
+internal_states V4={initial=0,unit="",description="internal state",display=false}
+%--------------------------------------------------------------------------
+parameters TR={initial=0.001,unit="s",description="",display=true}
+parameters KA={initial=400,unit="",description="",display=true}
+parameters TA={initial=0.4,unit="s",description="",display=true}
+parameters VRMIN={initial=-10,unit="",description="",display=true}
+parameters VRMAX={initial=10,unit="",description="",display=true}
+parameters KE={initial=1,unit="",description="",display=true}
+parameters TE={initial=0.2,unit="s",description="",display=true}
+parameters KF={initial=1,unit="",description="",display=true}
+parameters TF={initial=2,unit="s",description="",display=true}
+parameters E1={initial=3.135,unit="",description="",display=true}
+parameters SE1={initial=0.03,unit="",description="",display=true}
+parameters E2={initial=4.18,unit="",description="",display=true}
+parameters SE2={initial=0.1,unit="",description="",display=true}
+%--------------------------------------------------------------------------
+parameters VSTEP={initial=0,unit="",description="",display=true}
+parameters HASVUEL={initial=0,unit="",description="",display=false}
+parameters HASVOEL={initial=0,unit="",description="",display=false}
+%--------------------------------------------------------------------------
+initializations:
+%--------------------------------------------------------------------------
+ 
+%--------------------------------------------------------------------------
+f_equations:
+%-------------------------------------------------------------------------- 
+
+%-------------------------------------------------------------------------- 
+g_equations:
+%--------------------------------------------------------------------------
+g01 = V1 - lag(VC,dV1,1.0,TR,none,none)
+g02 = VR - lag(V2,dVR,KA,TA,VRMIN,VRMAX)
+g03 = dEFD - lag(V3,ddEFD,(1/KE),(TE/KE),none,none)
+g04 = VF - derlag(EFD,dVF,(KF/TF),TF,none,none)
+%-----------------------
+g05 = VS - (VPSS+VUEL+VOEL)
+%-----------------------
+g06 = V2 - ((VREF+VSTEP)-V1+VS-VF)
+%-----------------------
+g07 = V3 - (VR-V4)
+%-----------------------
+g08 = EFD - dEFD
+%-----------------------
+g09 = VX - saturation1(EFD,E1,SE1,E2,SE2)
+%-----------------------
+g10 = V4 - (VX*EFD)
+%--------------------------------------------------------------------------
+h_equations:
+%--------------------------------------------------------------------------
+
+%--------------------------------------------------------------------------
+checklimits:
+%--------------------------------------------------------------------------
+
+%--------------------------------------------------------------------------
+checkparameters:
+%--------------------------------------------------------------------------
+if ( TF == 0 )
+    print('TF is ZERO, must STOP')
+    ERROR
+end
+%--------------------------
+if ( TE == 0 )
+    print('TE is ZERO, must STOP')
+    ERROR
+end
+%--------------------------
+if ( KE == 0 )
+    print('KE is ZERO, must STOP')
+    ERROR
+end

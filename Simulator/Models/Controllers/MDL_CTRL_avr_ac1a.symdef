@@ -1,0 +1,149 @@
+VERSION=1
+%-------------------------------------------------------------------------- 
+definitions:
+%-------------------------------------------------------------------------- 
+baseclass=TSMController
+controllertype=AVR
+%-------------------------------------------------------------------------- 
+dynamic_states dV1={initial=1,unit="",description="dynamic state",display=false}
+dynamic_states dV3={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states dV4={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states dVE={initial=1,unit="",description="dynamic state",display=false}
+dynamic_states dVF={initial=1,unit="",description="dynamic state",display=false}
+%--------------------------------------------------------------------------
+inputs VC={initial=1,unit="",description="controlled voltage",display=true}
+inputs VPSS={initial=0,unit="",description="input from PSS",display=true}
+inputs VUEL={initial=-999,unit="",description="input from vuel",display=true}
+inputs VOEL={initial=999,unit="",description="input from voel",display=true}
+inputs VREF={initial=1,unit="",description="reference voltage",display=true}
+inputs IFD={initial=30,unit="",description="field current",display=true}
+%--------------------------------------------------------------------------
+external_states EFD={initial=1,unit="exciter voltage",description="",display=true}
+%--------------------------------------------------------------------------
+internal_states VE={initial=1,unit="",description="internal state",display=false}
+internal_states V1={initial=1,unit="",description="internal state",display=false}
+internal_states V4={initial=0,unit="",description="internal state",display=false}
+internal_states HVout={initial=1,unit="",description="internal state",display=false}
+internal_states LVout={initial=1,unit="",description="internal state",display=false}
+internal_states VR={initial=1,unit="",description="internal state",display=false}
+internal_states FEX={initial=1,unit="",description="internal state",display=false}
+internal_states V2={initial=1,unit="",description="internal state",display=false}
+internal_states V3={initial=1,unit="",description="internal state",display=false}
+internal_states V5={initial=0,unit="",description="internal state",display=false}
+internal_states VF={initial=0,unit="",description="internal state",display=false}
+internal_states VFE={initial=0,unit="",description="internal state",display=false}
+internal_states VX={initial=0,unit="",description="internal state",display=false}
+%--------------------------------------------------------------------------
+parameters TR={initial=0.0001,unit="s",description="",display=true}
+parameters TB={initial=0.0001,unit="s",description="",display=true}
+parameters TC={initial=0.0001,unit="s",description="",display=true}
+parameters KA={initial=400,unit="",description="",display=true}
+parameters TA={initial=0.2,unit="s",description="",display=true}
+parameters VAMAX={initial=14.5,unit="",description="",display=true}
+parameters VAMIN={initial=-14.5,unit="",description="",display=true}
+parameters TE={initial=0.8,unit="s",description="",display=true}
+parameters KF={initial=0.03,unit="",description="",display=true}
+parameters TF={initial=1,unit="s",description="",display=true}
+parameters KC={initial=0.2,unit="",description="",display=true}
+parameters KD={initial=0.38,unit="",description="",display=true}
+parameters KE={initial=1,unit="",description="",display=true}
+parameters E1={initial=3.135,unit="",description="",display=true}
+parameters SE1={initial=0.03,unit="",description="",display=true}
+parameters E2={initial=4.18,unit="",description="",display=true}
+parameters SE2={initial=0.1,unit="",description="",display=true}
+parameters VRMAX={initial=6.03,unit="",description="",display=true}
+parameters VRMIN={initial=-5.43,unit="",description="",display=true}
+%--------------------------------------------------------------------------
+parameters VSTEP={initial=0,unit="",description="",display=true}
+parameters HASVUEL={initial=0,unit="",description="",display=false}
+parameters HASVOEL={initial=0,unit="",description="",display=false}
+%-------------------------------------------------------------------------- 
+initializations:
+%--------------------------------------------------------------------------
+
+%-------------------------------------------------------------------------- 
+f_equations:
+%--------------------------------------------------------------------------  
+
+%-------------------------------------------------------------------------- 
+g_equations:
+%--------------------------------------------------------------------------
+g01 = V1 - lag(VC,dV1,1.0,TR,none,none)
+g02 = V3 - leadlag(V2,dV3,1.0,TC,TB,none,none)
+g03 = V4 - lag(V3,dV4,KA,TA,VAMIN,VAMAX)
+g04 = VF - derlag(VFE,dVF,(KF/TF),TF,none,none)
+g05 = VE - integ(V5,dVE,1/TE,1e-6,none)
+%--------------------------
+g1 = V2 - ((VREF+VSTEP) - V1 + VPSS - VF)
+%--------------------------
+if t < 0 || HASVUEL < 0.5
+    g3 = HVout - V4
+else
+    g3 = HVout - max(V4,VUEL)
+end
+%--------------------------
+if t < 0 || HASVOEL < 0.5 
+    g4 = LVout - HVout
+else
+    g4 = LVout - min(HVout,VOEL)
+end
+%--------------------------
+if t < 0 
+    g5 = VR - LVout
+else
+    g5 = VR - limit(LVout,VRMIN,VRMAX)
+end
+%--------------------------
+g6 = V5 - (VR - VFE)
+%--------------------------
+if t < -10 
+    g7 = FEX - (1-(KC * IFD )/VE)
+else
+    g7 = FEX - statexc((KC * IFD )/VE)
+end
+%--------------------------
+if E1 == 0.0
+    g8 = VX - VE
+else    
+    g8 = VX - saturation1(VE,E1,SE1,E2,SE2)
+end
+%--------------------------
+g11 = VFE - (VX + KE*VE + KD*IFD)
+%--------------------------
+g13 = EFD - (VE*FEX)
+%-------------------------------------------------------------------------- 
+h_equations:
+%--------------------------------------------------------------------------
+
+%--------------------------------------------------------------------------
+checklimits:
+%--------------------------------------------------------------------------
+if  V4 > VAMAX 
+    print('(V4=%d) larger than upper limit (VAMAX=%d)',V4,VAMAX)
+    STOP
+end
+if V4 < VAMIN 
+    print('(V4=%d) smaller than lower limit (VAMIN=%d)',V4,VAMIN)
+    STOP
+end
+%--------------------------
+if  VR > VRMAX 
+    print('(VR=%d) larger than upper limit (VRMAX=%d)',VR,VRMAX)
+    STOP
+end
+if VR < VRMIN 
+    print('(VR=%d) smaller than lower limit (VRMIN=%d)',VR,VRMIN)
+    STOP
+end
+%--------------------------
+if VE < 0 
+    print('(VE=%d) smaller than lower limit (0=%d)',VE,0)
+    STOP
+end
+%--------------------------------------------------------------------------
+checkparameters:
+%--------------------------------------------------------------------------
+if ( TF == 0 )
+    print('TF is ZERO, must STOP')
+    STOP
+end

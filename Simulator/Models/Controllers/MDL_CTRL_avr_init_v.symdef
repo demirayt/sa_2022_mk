@@ -1,0 +1,24 @@
+%----------------------- 
+definitions:
+%-----------------------
+dynamic_states dEfd=1
+inputs VT=1 
+external_states EFD=1
+parameters Vsetpoint=1
+%-----------------------
+initializations:
+%----------------------- 
+%-----------------------
+f_equations:
+%----------------------- 
+if t < 0
+    dt(dEfd) = VT - Vsetpoint
+else
+    dt(dEfd) = 0
+end
+%----------------------- 
+g_equations:
+%-----------------------
+g1= EFD - dEfd
+%-----------------------
+h_equations:

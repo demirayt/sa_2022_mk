@@ -1,0 +1,48 @@
+class branch
+%----------------------- 
+definitions:
+%-----------------------
+inputs VD1=1 VQ1 VD2=1 VQ2 
+external_states ID1 IQ1 ID2 IQ2
+parameters Y11D Y11Q Y12D Y12Q Y21D Y21Q Y22D Y22Q SIDE1_ON=1 SIDE2_ON=1 
+%-----------------------
+initializations:
+%----------------------- 
+%-----------------------
+f_equations:
+%----------------------- 
+%----------------------- 
+g_equations:
+%-----------------------
+if SIDE1_ON > 0.5 & SIDE2_ON > 0.5
+    g1 = ID1-(Y11D)*VD1+(Y11Q)*VQ1-(Y12D)*VD2+(Y12Q)*VQ2
+    g2 = IQ1-(Y11D)*VQ1-(Y11Q)*VD1-(Y12D)*VQ2-(Y12Q)*VD2
+    g3 = ID2-(Y21D)*VD1+(Y12Q)*VQ1-(Y22D)*VD2+(Y22Q)*VQ2
+    g4 = IQ2-(Y21D)*VQ1-(Y12Q)*VD1-(Y22D)*VQ2-(Y22Q)*VD2
+else
+    if SIDE1_ON > 0.5 & SIDE2_ON < 0.5
+        g1 = ID1*Y22D-IQ1*Y22Q+Y11D*VQ1*Y22Q+Y11Q*VD1*Y22Q+Y11Q*VQ1*Y22D-Y12D*Y21Q*VQ1-Y11D*VD1*Y22D+Y12D*Y21D*VD1-Y12Q*Y21D*VQ1-Y12Q*Y21Q*VD1
+        g2 = ID1*Y22Q+IQ1*Y22D-Y11D*VD1*Y22Q+Y11Q*VQ1*Y22Q-Y11D*VQ1*Y22D-Y11Q*VD1*Y22D+Y12D*Y21D*VQ1-Y12Q*Y21Q*VQ1+Y12D*Y21Q*VD1+Y12Q*Y21D*VD1
+        g3 = ID2
+        g4 = IQ2
+    else
+	    if SIDE1_ON < 0.5 & SIDE2_ON > 0.5
+		g1 = ID1
+		g2 = IQ1
+		g3 = -IQ2*Y11Q+Y12D*Y21D*VD2-Y22D*VD2*Y11D+ID2*Y11D-Y12Q*Y21D*VQ2-Y12D*Y21Q*VQ2-Y12Q*Y21Q*VD2+Y22D*VQ2*Y11Q+Y22Q*VD2*Y11Q+Y22Q*VQ2*Y11D
+		g4 = IQ2*Y11D+ID2*Y11Q+Y12D*Y21D*VQ2-Y12Q*Y21Q*VQ2+Y12Q*Y21D*VD2+Y12D*Y21Q*VD2-Y22D*VD2*Y11Q+Y22Q*VQ2*Y11Q-Y22D*VQ2*Y11D-Y22Q*VD2*Y11D 
+	    else
+		g1 = ID1
+		g2 = IQ1
+		g3 = ID2
+		g4 = IQ2
+	    end
+    end
+end
+%-----------------------
+h_equations:
+%-----------------------
+
+%-----------------------
+measurements:
+%-----------------------

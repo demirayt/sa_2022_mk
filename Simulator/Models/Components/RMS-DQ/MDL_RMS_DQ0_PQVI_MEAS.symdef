@@ -1,0 +1,35 @@
+VERSION=1
+%-------------------------------------------------------------------------- 
+definitions:
+%--------------------------------------------------------------------------
+inputs ID={initial=0,unit="pu",description="component of the current source controlling the active power",display=true}
+inputs IQ={initial=0,unit="pu",description="component of the current source controlling the reactive power",display=true}
+inputs VD={initial=1,unit="pu",description="real-part of positive sequence voltage",display=true}
+inputs VQ={initial=0,unit="pu",description="imaginary-part of positive sequence voltage",display=true}
+%--------------------------------------------------------------------------
+external_states P={initial=0,unit="pu",description="real-part of positive sequence current",display=true}
+external_states Q={initial=0,unit="pu",description="imaginary-part of positive sequence current",display=true}
+external_states Imag={initial=0,unit="pu",description="active power",display=true}
+external_states Vmag={initial=0,unit="pu",description="reactive power",display=true}
+%--------------------------------------------------------------------------
+parameters SR={initial=100,unit="pu",description="resistance",display=true}
+parameters SN={initial=100,unit="pu",description="inductance",display=true}
+parameters UR={initial=10,unit="pu",description="resistance",display=true}
+parameters UN={initial=10,unit="pu",description="inductance",display=true}
+%--------------------------------------------------------------------------
+initializations:
+%-------------------------------------------------------------------------- 
+%--------------------------------------------------------------------------
+f_equations:
+%-------------------------------------------------------------------------- 
+
+%-------------------------------------------------------------------------- 
+g_equations:
+%--------------------------------------------------------------------------
+g1 = P - SN/SR*(VD*ID + VQ*IQ)
+g2 = Q - SN/SR*(VQ*ID - VD*IQ)
+g3 = Imag - magnitude(ID,IQ,(SN/UN)/(SR/UR))
+g4 = Vmag - magnitude(VD,VQ,UN/UR)
+%--------------------------------------------------------------------------
+h_equations:
+%--------------------------------------------------------------------------

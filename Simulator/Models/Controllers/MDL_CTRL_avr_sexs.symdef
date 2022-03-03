@@ -1,0 +1,47 @@
+%-------------------------------------------------------------------------- 
+definitions:
+%--------------------------------------------------------------------------
+
+%--------------------------------------------------------------------------
+dynamic_states dV2={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states dV3={initial=0,unit="",description="dynamic state",display=false}
+%--------------------------------------------------------------------------
+inputs VT={initial=1,unit="",description="controlled voltage",display=true}
+inputs VPSS={initial=0,unit="",description="input signal from PSS",display=true}
+inputs VUEL={initial=-999,unit="",description="input from voel",display=true}
+inputs VOEL={initial=999,unit="",description="input from vuel",display=true}
+inputs VREF={initial=1,unit="",description="reference voltage",display=true}
+%--------------------------------------------------------------------------
+external_states EFD={initial=1,unit="",description="exciter voltage",display=true}
+%--------------------------------------------------------------------------
+internal_states VS={initial=0,unit="",description="internal state",display=false}
+internal_states V1={initial=1,unit="",description="internal state",display=false}
+internal_states V2={initial=1,unit="",description="internal state",display=false}
+%--------------------------------------------------------------------------
+parameters TATB={initial=0.3,unit="",description="",display=true}
+parameters TB={initial=10,unit="s",description="",display=true}
+parameters K={initial=200,unit="",description="",display=true}
+parameters TE={initial=0.05,unit="s",description="",display=true}
+parameters EMIN={initial=0,unit="",description="",display=true}
+parameters EMAX={initial=4,unit="",description="",display=true}
+%--------------------------------------------------------------------------
+parameters VSTEP={initial=0,unit="",description="",display=true}
+%--------------------------------------------------------------------------
+
+%--------------------------------------------------------------------------
+initializations:
+%--------------------------------------------------------------------------
+
+%-------------------------------------------------------------------------- 
+f_equations:
+%--------------------------------------------------------------------------
+
+%-------------------------------------------------------------------------- 
+g_equations:
+%--------------------------------------------------------------------------
+g01 = VS - (VPSS+VOEL+VUEL)
+g02 = V1 - ((VREF+VSTEP)+VS-VT)
+g03 = V2 - leadlag(V1,dV2,1.0,(TATB*TB),TB,none,none)
+g04 = EFD - lag(V2,dV3,K,TE,EMIN,EMAX)
+
+

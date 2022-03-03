@@ -1,0 +1,137 @@
+%----------------------- 
+definitions:
+%-----------------------
+dynamic_states dVref=1 dV1=1 dV23 dV4=1 dVE=1 dVF=1
+external_states VD1=1 VQ1 ID1 IQ1 VT=1 VPSS EFD=1 IFD=30  VUEL=-999 VOEL=999
+internal_states VC1=1 VA_ULS=1 VA_LLS=1 VE_LLS=1 HVout=1 LVout=1 VR=1 FEX=1
+events ev_VA_ULD ev_VA_LLD ev_HV ev_LV ev_VE_LLD ev_VRmin ev_VRmax ev_statexc1 ev_statexc2 ev_statexc3 ev_statexc4
+parameters Vsetpoint RC XC TR=0.1 TB=14.0 TC=14.1 KA=800.0 TA=0.1 VAMIN=15.0 VAMAX=15.0 VRMIN=-14.0 VRMAX=14.0 VEMIN=0.000001 TE K0=1 K1 K2 KC KE=0.1 KD=0.1 KF=0.15 TF=1.4
+%-----------------------
+
+%-----------------------
+initializations:
+%----------------------- 
+
+%-----------------------
+f_equations:
+%----------------------- 
+if t < 0
+    dt(dVref)= VT - Vsetpoint
+else
+    dt(dVref)=0
+end
+dt(dV1)= 1/TA*(VC1 - dV1)
+dt(dV23) = (-1/TB*dV23+(TB-TC)/TB/TB*(dVref - ((KF/TF)*(KD*IFD + KE*dVE + dVE * (K0 + K1 * exp(K2*dVE)))-dVF) - dV1 + VPSS))
+dt(dV4)= 1/TA*(KA*(dV23+TC/TB*(dVref - ((KF/TF)*(KD*IFD + KE*dVE + dVE * (K0 + K1 * exp(K2*dVE)))-dVF) - dV1 + VPSS)) - dV4)*VA_ULS*VA_LLS
+dt(dVE)= (1/TE)*(VR - (KD*IFD + KE*dVE + dVE * (K0 + K1 * exp(K2*dVE))) )*VE_LLS
+dt(dVF) = 1/TF*((KF/TF)*(KD*IFD + KE*dVE + dVE * (K0 + K1 * exp(K2*dVE)))-dVF)
+%----------------------- 
+g_equations:
+%-----------------------
+if t < 0
+        g1 = VA_ULS - 1
+        g2 = ev_VA_ULD - dV4 + VAMAX
+        g3 = VA_LLS - 1
+        g4 = ev_VA_LLD - dV4 + VAMIN
+else
+    if ev_VA_ULD < 0
+        g1 = VA_ULS - 1
+        g2 = ev_VA_ULD - dV4 + VAMAX
+    else
+        g1 = VA_ULS
+        g2 = ev_VA_ULD - (KA*(dV23+TC/TB*(dVref - ((KF/TF)*(KD*IFD + KE*dVE + dVE * (K0 + K1 * exp(K2*dVE)))-dVF) - dV1 + VPSS)) - dV4)
+    end
+
+
+    if ev_VA_LLD > 0
+        g3 = VA_LLS - 1
+        g4 = ev_VA_LLD - dV4 + VAMIN
+    else
+        g3 = VA_LLS
+        g4 = ev_VA_LLD - (KA*(dV23+TC/TB*(dVref - ((KF/TF)*(KD*IFD + KE*dVE + dVE * (K0 + K1 * exp(K2*dVE)))-dVF) - dV1 + VPSS)) - dV4)
+    end
+end
+%--------------------------
+g5 = ev_HV - (VUEL-dV4)
+if t < 0
+    g6 = HVout - dV4
+else
+    if ev_HV > 0
+        g6 = HVout - VUEL
+    else
+        g6 = HVout - dV4
+    end
+end
+%--------------------------
+g7 = ev_LV - (VOEL-HVout)
+if t < 0
+    g8 = LVout - HVout
+else
+    if ev_LV < 0
+        g8 = LVout - VOEL
+    else
+        g8 = LVout - HVout
+    end
+end
+%--------------------------
+g9 = ev_VRmin - (LVout - VRMIN )
+g10 = ev_VRmax - (LVout - VRMAX )  
+if t < 0
+    g11 = VR - LVout
+else
+    if ev_VRmax > 0
+        g11 = VR - VRMAX
+    else
+        if ev_VRmin > 0
+            g11 = VR - LVout
+        else
+            g11 = VR - VRMIN
+        end
+    end
+end
+%--------------------------
+if t < 0
+    g12 = VE_LLS - 1
+    g13 = ev_VE_LLD - dVE + VEMIN
+else
+    if ev_VE_LLD > 0
+        g12 = VE_LLS - 1
+        g13 = ev_VE_LLD - dVE + VEMIN
+    else
+        g12 = VE_LLS
+        g13 = ev_VE_LLD - (1/TE)*(VR - (KD*IFD + KE*dVE + dVE * (K0 + K1 * exp(K2*dVE))) )
+    end
+end
+%--------------------------
+g17 = ev_statexc1 - ((KC * IFD )/dVE - 0)
+g18 = ev_statexc2 - ((KC * IFD )/dVE - 0.433)
+g19 = ev_statexc3 - ((KC * IFD )/dVE - 0.75)
+g20 = ev_statexc4 - ((KC * IFD )/dVE - 1)
+if t < -10
+   g21 = FEX - (1-(KC * IFD )/dVE)
+else
+    if ev_statexc1 < 0
+        g21 = FEX - 1
+    else
+        if ev_statexc2 < 0  
+            g21 = FEX - (1-0.5774*(KC * IFD )/dVE)
+        else
+            if ev_statexc3 < 0
+                g21 = FEX^2 - (0.75 - (KC * IFD )/dVE * (KC * IFD )/dVE)
+            else
+                if ev_statexc4 < 0
+                   g21 = FEX -(1.732 * (1-(KC * IFD )/dVE))
+                else
+                   g21 = FEX - 0
+                end
+            end
+        end
+    end
+end
+%--------------------------
+g22 = EFD - (dVE*FEX)
+g25 = VC1 - sqrt(2*VQ1*IQ1*RC+2*VQ1*ID1*XC+ID1^2*RC^2+VQ1^2+VD1^2+IQ1^2*XC^2-2*VD1*IQ1*XC+2*VD1*ID1*RC+IQ1^2*RC^2+ID1^2*XC^2)
+
+%-----------------------
+h_equations:
+%-----------------------

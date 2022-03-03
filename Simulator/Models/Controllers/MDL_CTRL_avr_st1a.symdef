@@ -1,0 +1,150 @@
+VERSION=1
+%-------------------------------------------------------------------------- 
+definitions:
+%-------------------------------------------------------------------------- 
+baseclass=TSMController
+controllertype=AVR
+%--------------------------------------------------------------------------
+dynamic_states dV1={initial=1,unit="",description="dynamic state",display=false}
+dynamic_states dV3={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states dV31={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states dVA={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states dVF={initial=0,unit="",description="dynamic state",display=false}
+%--------------------------------------------------------------------------
+inputs VT={initial=1,unit="",description="terminal voltage",display=true}
+inputs VC={initial=1,unit="",description="controlled voltage",display=true}
+inputs VPSS={initial=0,unit="",description="input from PSS",display=true}
+inputs IFD={initial=30,unit="",description="field current",display=true}
+inputs VUEL={initial=-999,unit="",description="input from vuel",display=true}
+inputs VOEL={initial=999,unit="",description="input from voel",display=true}
+inputs VREF={initial=1,unit="",description="reference voltage",display=true}
+%--------------------------------------------------------------------------
+external_states EFD={initial=1,unit="",description="exciter voltage",display=true}
+%--------------------------------------------------------------------------
+internal_states V1={initial=1,unit="",description="internal state",display=false}
+internal_states V2={initial=0,unit="",description="internal state",display=false}
+internal_states VI={initial=0,unit="",description="internal state",display=false}
+internal_states HVout={initial=1,unit="",description="internal state",display=false}
+internal_states V31={initial=1,unit="",description="internal state",display=false}
+internal_states V3={initial=1,unit="",description="internal state",display=false}
+internal_states VA={initial=0,unit="",description="internal state",display=false}
+internal_states V4={initial=1,unit="",description="internal state",display=false}
+internal_states HVout2={initial=1,unit="",description="internal state",display=false}
+internal_states V5={initial=1,unit="",description="internal state",display=false}
+internal_states VF={initial=0,unit="",description="internal state",display=false}
+internal_states V7={initial=0,unit="",description="internal state",display=false}
+internal_states VUEL2={initial=0,unit="",description="internal state",display=false}
+%--------------------------------------------------------------------------
+parameters VOS={initial=1,unit="bool",description="vpss switch",display=true}
+parameters UEL={initial=0,unit="integer",description="vuel switch",display=true}
+parameters TR={initial=0.001,unit="s",description="",display=true}
+parameters VIMAX={initial=999,unit="",description="",display=true}
+parameters VIMIN={initial=-999,unit="",description="",display=true}
+parameters TB={initial=10,unit="s",description="",display=true}
+parameters TC={initial=1,unit="s",description="",display=true}
+parameters TC1={initial=0,unit="s",description="",display=true}
+parameters TB1={initial=0,unit="s",description="",display=true}
+parameters KA={initial=190,unit="",description="",display=true}
+parameters TA={initial=0.0,unit="s",description="",display=true}
+parameters VAMAX={initial=14.5,unit="",description="",display=true}
+parameters VAMIN={initial=-14.5,unit="",description="",display=true}
+parameters KLR={initial=0.0,unit="",description="",display=true}
+parameters ILR={initial=0.0,unit="",description="",display=true}
+parameters KF={initial=0.0,unit="",description="",display=true}
+parameters TF={initial=1,unit="s",description="",display=true}
+parameters VRMAX={initial=7.8,unit="",description="",display=true}
+parameters VRMIN={initial=-6.7,unit="",description="",display=true}
+parameters KC={initial=0.08,unit="",description="",display=true}
+%--------------------------------------------------------------------------
+parameters VSTEP={initial=0,unit="",description="",display=true}
+parameters HASVUEL={initial=0,unit="",description="",display=false}
+parameters HASVOEL={initial=0,unit="",description="",display=false}
+%--------------------------------------------------------------------------
+initializations:
+%--------------------------------------------------------------------------
+ 
+%--------------------------------------------------------------------------
+f_equations:
+%-------------------------------------------------------------------------- 
+
+%-------------------------------------------------------------------------- 
+g_equations:
+%--------------------------------------------------------------------------
+g01 = V1 - lag(VC,dV1,1.0,TR,none,none)
+g02 = V31 - leadlag(HVout,dV31,1.0,TC,TB,none,none)
+g03 = V3 - leadlag(V31,dV3,1.0,TC1,TB1,none,none)
+g04 = VA - lag(V3,dVA,KA,TA,VAMIN,VAMAX)
+g05 = VF - derlag(V5,dVF,(KF/TF),TF,none,none)
+if UEL == 0 
+	g051= VUEL2 - 0
+else 
+	g051= VUEL2 - VUEL
+end
+%-----------------------
+if UEL == 3
+    if VOS == 1
+        g06 = V2 - ((VREF+VSTEP) - VF - V1 + VPSS + VUEL2)
+    else
+        g06 = V2 - ((VREF+VSTEP) - VF - V1 + VUEL2)
+    end
+else
+    if VOS == 1 
+        g06 = V2 - ((VREF+VSTEP) - VF - V1 + VPSS)
+    else
+        g06 = V2 - ((VREF+VSTEP) - VF - V1)
+    end
+end
+%-----------------------
+g07 = VI - limit(V2,VIMIN,VIMAX,1)
+%-----------------------
+if UEL == 2
+    if t < 0 || HASVUEL < 0.5
+        g08 = HVout - VI
+    else
+        g08 = HVout - max(VI,VUEL2)
+    end
+else
+    g08 = HVout - VI
+end
+%-----------------------
+if VOS == 0
+    g09 = V4 -(VPSS+VA-V7)
+else
+    g09 = V4 -(VA-V7)
+end
+%-----------------------
+if UEL == 1
+    if t < 0 || HASVUEL < 0.5
+        g10 = HVout2 - V4
+    else
+        g10 = HVout2 - max(V4,VUEL2)
+    end
+else
+    g10 = HVout2 - V4
+end
+%-----------------------
+if t < 0 || HASVOEL < 0.5
+    g11 = V5 - HVout2
+else
+    g11 = V5 - min(HVout2,VOEL)
+end
+%-----------------------
+g12 = V7 - limit(KLR*(IFD-ILR),0,none,1)
+%-----------------------
+g13 = EFD - limit(V5,VT*VRMIN,VT*VRMAX-IFD*KC,1)
+%--------------------------------------------------------------------------
+h_equations:
+%--------------------------------------------------------------------------
+
+%--------------------------------------------------------------------------
+checklimits:
+%--------------------------------------------------------------------------
+
+%--------------------------------------------------------------------------
+checkparameters:
+%--------------------------------------------------------------------------
+if ( TF == 0 )
+    print('TF is ZERO, must STOP')
+    ERROR
+end
+%--------------------------

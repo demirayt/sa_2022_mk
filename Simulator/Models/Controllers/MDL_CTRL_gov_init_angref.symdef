@@ -1,0 +1,27 @@
+definitions:
+%-----------------------
+dynamic_states Torder=1
+external_states VQ1 TMECH=1 W=1
+parameters Setpoint=1 angle0
+%-----------------------
+initializations:
+%----------------------- 
+%-----------------------
+f_equations:
+%----------------------- 
+if t < 0
+    dt(Torder) = VQ1 - Setpoint*sin(angle0)
+else
+    dt(Torder) = 0;
+end
+%----------------------- 
+g_equations:
+%-----------------------
+g1= TMECH - Torder;
+%-----------------------
+h_equations:
+%-----------------------
+measurements:
+%-----------------------
+%-----------------------
+

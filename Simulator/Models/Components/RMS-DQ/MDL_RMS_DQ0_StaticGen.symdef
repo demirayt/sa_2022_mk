@@ -1,0 +1,51 @@
+VERSION=1
+%-------------------------------------------------------------------------- 
+definitions:
+%--------------------------------------------------------------------------
+inputs IPCMD={initial=0,unit="pu",description="component of the current source controlling the active power",display=true}
+inputs IQCMD={initial=0,unit="pu",description="component of the current source controlling the reactive power",display=true}
+inputs VD1={initial=1,unit="pu",description="real-part of positive sequence voltage",display=true}
+inputs VQ1={initial=0,unit="pu",description="imaginary-part of positive sequence voltage",display=true}
+inputs VT={initial=1,unit="pu",description="terminal voltage",display=true}
+%--------------------------------------------------------------------------
+external_states ID1={initial=0,unit="pu",description="real-part of positive sequence current",display=true}
+external_states IQ1={initial=0,unit="pu",description="imaginary-part of positive sequence current",display=true}
+external_states P1={initial=0,unit="pu",description="active power",display=true}
+external_states Q1={initial=0,unit="pu",description="reactive power",display=true}
+%--------------------------------------------------------------------------
+internal_states VD1R={initial=1,unit="pu",description="real-part of positive sequence voltage",display=true}
+internal_states VQ1R={initial=0,unit="pu",description="imaginary-part of positive sequence voltage",display=true}
+internal_states ID1R={initial=0,unit="pu",description="real-part of positive sequence current",display=true}
+internal_states IQ1R={initial=0,unit="pu",description="imaginary-part of positive sequence current",display=true}
+internal_states P1R={initial=0,unit="pu",description="real-part of positive sequence current",display=true}
+internal_states Q1R={initial=0,unit="pu",description="imaginary-part of positive sequence current",display=true}
+internal_states IT1R={initial=1,unit="pu",description="reactive power",display=true}
+%-------------------------------------------------------------------------- 
+parameters SR1={initial=100,unit="pu",description="resistance",display=true}
+parameters SN1={initial=100,unit="pu",description="inductance",display=true}
+parameters UR1={initial=10,unit="pu",description="resistance",display=true}
+parameters UN1={initial=10,unit="pu",description="inductance",display=true}
+%--------------------------------------------------------------------------
+initializations:
+%--------------------------------------------------------------------------
+f_equations:
+%-------------------------------------------------------------------------- 
+
+%-------------------------------------------------------------------------- 
+g_equations:
+%--------------------------------------------------------------------------
+g00a = VD1*UN1 - VD1R*UR1
+g00b = VQ1*UN1 - VQ1R*UR1
+g00c = ID1*SN1/UN1 + ID1R*SR1/UR1
+g00d = IQ1*SN1/UN1 + IQ1R*SR1/UR1
+%--------------------------------------------------------------------------
+g1 = VT*ID1R + (IPCMD*VD1R - IQCMD*VQ1R)
+g2 = VT*IQ1R - (IPCMD*VQ1R + IQCMD*VD1R)
+g3 = P1 - (VD1*ID1 + VQ1*IQ1)
+g4 = Q1 - (VQ1*ID1 - VD1*IQ1)
+g5 = IT1R - magnitude(ID1R,IQ1R,1.0)
+g6 = P1R - (VD1R*ID1R + VQ1R*IQ1R)
+g7 = Q1R - (VQ1R*ID1R - VD1R*IQ1R)
+%--------------------------------------------------------------------------
+h_equations:
+%--------------------------------------------------------------------------

@@ -1,0 +1,63 @@
+%----------------------- 
+definitions:
+%-----------------------
+dynamic_states ED=1 EQ xP0 xQ0 xV0=1
+inputs VD1=1 VQ1 VT
+external_states ID1 IQ1 
+internal_states P1 Q1 
+parameters V0=1 Vang0 P0 Q0 R X w0 Zbase kappa eta alpha LFTYPE SIDE1_ON=1
+%-----------------------
+initializations:
+%----------------------- 
+%--------------------------------------------------------------------------
+f_equations:
+%-------------------------------------------------------------------------- 
+if t < 0
+    dt(xP0) = xP0 - P1
+    dt(xQ0) = xQ0 - Q1
+    dt(xV0) = xV0 - VT
+   if LFTYPE==3
+       dt(EQ) =  EQ
+       dt(ED) =  VT - V0
+   else
+       if LFTYPE==2
+           dt(EQ) =  P1 - P0
+           dt(ED) =  VT - V0
+       else
+           dt(EQ) =  P1 - P0
+           dt(ED) =  Q1 - Q0
+       end
+   end
+else
+   dt(xP0) = 0
+   dt(xQ0) = 0
+   dt(xV0) = 0
+   if LFTYPE==3
+dt(ED) = -eta*((((-ID1)*cos(kappa) - (-IQ1)*sin(kappa)))/Zbase - ((VD1*((xP0*cos(kappa))/V0^2 + (xQ0*sin(kappa))/V0^2) + VQ1*((xQ0*cos(kappa))/V0^2 - (xP0*sin(kappa))/V0^2)))/Zbase + (VD1*alpha*(VT^2 - V0^2))/V0^2)
+ dt(EQ) = -eta*(((VD1*((xQ0*cos(kappa))/V0^2 - (xP0*sin(kappa))/V0^2) - VQ1*((xP0*cos(kappa))/V0^2 + (xQ0*sin(kappa))/V0^2)))/Zbase + (((-IQ1)*cos(kappa) + (-ID1)*sin(kappa)))/Zbase + (VQ1*alpha*(VT^2 - V0^2))/V0^2) 
+   else
+       if LFTYPE==2
+dt(ED) = -eta*((((-ID1)*cos(kappa) - (-IQ1)*sin(kappa)))/Zbase - ((VD1*((P0*cos(kappa))/V0^2 + (xQ0*sin(kappa))/V0^2) + VQ1*((xQ0*cos(kappa))/V0^2 - (P0*sin(kappa))/V0^2)))/Zbase + (VD1*alpha*(VT^2 - V0^2))/V0^2) 
+ dt(EQ) = -eta*(((VD1*((xQ0*cos(kappa))/V0^2 - (P0*sin(kappa))/V0^2) - VQ1*((P0*cos(kappa))/V0^2 + (xQ0*sin(kappa))/V0^2)))/Zbase + (((-IQ1)*cos(kappa) + (-ID1)*sin(kappa)))/Zbase + (VQ1*alpha*(VT^2 - V0^2))/V0^2) 
+       else
+dt(ED) = -eta*((((-ID1)*cos(kappa) - (-IQ1)*sin(kappa)))/Zbase - ((VD1*((P0*cos(kappa))/xV0^2 + (Q0*sin(kappa))/xV0^2) + VQ1*((Q0*cos(kappa))/xV0^2 - (P0*sin(kappa))/xV0^2)))/Zbase + (VD1*alpha*(VT^2 - xV0^2))/xV0^2) 
+ dt(EQ) = -eta*(((VD1*((Q0*cos(kappa))/xV0^2 - (P0*sin(kappa))/xV0^2) - VQ1*((P0*cos(kappa))/xV0^2 + (Q0*sin(kappa))/xV0^2)))/Zbase + (((-IQ1)*cos(kappa) + (-ID1)*sin(kappa)))/Zbase + (VQ1*alpha*(VT^2 - xV0^2))/xV0^2)
+       end
+   end
+
+end
+
+
+
+
+%-------------------------------------------------------------------------- 
+g_equations:
+%--------------------------------------------------------------------------
+g1 = SIDE1_ON*(VD1-ED) - (1-SIDE1_ON)*(-ID1)
+g2 = SIDE1_ON*(VQ1-EQ) - (1-SIDE1_ON)*(-IQ1)
+
+g3 = P1 - (VD1*(-ID1)+VQ1*(-IQ1))
+g4 = Q1 - (VQ1*(-ID1)-VD1*(-IQ1))
+%--------------------------------------------------------------------------
+h_equations:
+%--------------------------------------------------------------------------

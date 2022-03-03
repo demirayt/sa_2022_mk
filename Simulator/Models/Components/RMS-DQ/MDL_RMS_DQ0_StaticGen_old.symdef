@@ -1,0 +1,34 @@
+VERSION=1
+%-------------------------------------------------------------------------- 
+definitions:
+%--------------------------------------------------------------------------
+inputs IPCMD={initial=0,unit="pu",description="component of the current source controlling the active power",display=true}
+inputs IQCMD={initial=0,unit="pu",description="component of the current source controlling the reactive power",display=true}
+inputs VD1={initial=1,unit="pu",description="real-part of positive sequence voltage",display=true}
+inputs VQ1={initial=0,unit="pu",description="imaginary-part of positive sequence voltage",display=true}
+inputs VT={initial=1,unit="pu",description="terminal voltage",display=true}
+%--------------------------------------------------------------------------
+external_states ID1={initial=0,unit="pu",description="real-part of positive sequence current",display=true}
+external_states IQ1={initial=0,unit="pu",description="imaginary-part of positive sequence current",display=true}
+external_states P1={initial=0,unit="pu",description="active power",display=true}
+external_states Q1={initial=0,unit="pu",description="reactive power",display=true}
+external_states IT={initial=1,unit="pu",description="reactive power",display=true}
+%--------------------------------------------------------------------------
+initializations:
+%-------------------------------------------------------------------------- 
+
+%--------------------------------------------------------------------------
+f_equations:
+%-------------------------------------------------------------------------- 
+
+%-------------------------------------------------------------------------- 
+g_equations:
+%--------------------------------------------------------------------------
+g1 = VT*ID1 - (IPCMD*VD1 - IQCMD*VQ1)
+g2 = VT*IQ1 - (IPCMD*VQ1 + IQCMD*VD1)
+g3 = P1 - (VD1*ID1 + VQ1*IQ1)
+g4 = Q1 - (VQ1*ID1 - VD1*IQ1)
+g5 = IT - magnitude(ID1,IQ1,1.0)
+%--------------------------------------------------------------------------
+h_equations:
+%--------------------------------------------------------------------------

@@ -1,0 +1,159 @@
+VERSION=1
+%-------------------------------------------------------------------------- 
+definitions:
+%--------------------------------------------------------------------------
+baseclass=TSMController
+controllertype=PSS
+%-------------------------------------------------------------------------- 
+dynamic_states dVT={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states x1={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states x2={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states x3={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states x4={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states dV2={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states dV3={initial=0,unit="",description="dynamic state",display=false}
+dynamic_states dV4={initial=0,unit="",description="dynamic state",display=false}
+%--------------------------------------------------------------------------
+inputs W={initial=1,unit="rad/s",description="rotor angular speed",display=true}
+inputs P={initial=1,unit="",description="active power",display=true}
+inputs VT={initial=1,unit="",description="terminal voltage",display=true}
+inputs IFD={initial=1,unit="",description="field current",display=true}
+%--------------------------------------------------------------------------
+external_states VPSS={initial=1,unit="",description="PSS ouptut",display=true}
+%--------------------------------------------------------------------------
+internal_states derVT={initial=1,unit="",description="internal state",display=false}
+internal_states VIN1={initial=1,unit="",description="internal state",display=false}
+internal_states V1={initial=1,unit="",description="internal state",display=false}
+internal_states V1a={initial=1,unit="",description="internal state",display=false}
+internal_states V2={initial=1,unit="",description="internal state",display=false}
+internal_states V3={initial=1,unit="",description="internal state",display=false}
+internal_states V4={initial=1,unit="",description="internal state",display=false}
+internal_states VSS={initial=1,unit="",description="internal state",display=false}
+%--------------------------------------------------------------------------
+events !ev_VCL !ev_VCU
+%--------------------------------------------------------------------------
+parameters A1={initial=1,unit="",description="",display=true}
+parameters A2={initial=2,unit="",description="",display=true}
+parameters A3={initial=3,unit="",description="",display=true}
+parameters A4={initial=4,unit="",description="",display=true}
+parameters A5={initial=5,unit="",description="",display=true}
+parameters A6={initial=6,unit="",description="",display=true}
+parameters T1={initial=1,unit="s",description="",display=true}
+parameters T2={initial=1,unit="s",description="",display=true}
+parameters T3={initial=3,unit="s",description="",display=true}
+parameters T4={initial=4,unit="s",description="",display=true}
+parameters T5={initial=3,unit="s",description="",display=true}
+parameters T6={initial=2,unit="s",description="",display=true}
+parameters KS={initial=1,unit="",description="",display=true}
+parameters LSMIN={initial=-10,unit="",description="",display=true}
+parameters LSMAX={initial=10,unit="",description="",display=true}
+parameters VCL={initial=-1e6,unit="",description="",display=true}
+parameters VCU={initial=1e6,unit="",description="",display=true}
+parameters SWS1={initial=1,unit="enum",description="input signal switch",display=true}
+%--------------------------------------------------------------------------
+initializations:
+%--------------------------------------------------------------------------
+ 
+%--------------------------------------------------------------------------
+f_equations:
+%-------------------------------------------------------------------------- 
+
+%-------------------------------------------------------------------------- 
+g_equations:
+%--------------------------------------------------------------------------
+g01 = derVT - derlag(VT,dVT,10000,0.0001,none,none)
+g02a = V1a - r2(VIN1,x1,x2,1,A3,A4,1,0,0,none,none)
+g02 = V1 - r2(V1a,x3,x4,1,A1,A2,1,A5,A6,none,none)
+g03 = V2 - leadlag(V1,dV2,1.0,T1,T2,none,none)
+g04 = V3 - leadlag(V2,dV3,1.0,T3,T4,none,none)
+g05 = V4 - derlag(V3,dV4,(KS*T5/T6),T6,none,none)
+%-----------------------
+if SWS1 == 0
+    g06 = VIN1 - W
+else
+    if SWS1 == 1
+        g06 = VIN1 - (W-1)
+    else
+        if SWS1 == 2 
+                %-- in CIM the busFrequency is selected, we are using the rotor speed (W) instead of it
+           g06 = VIN1 - W 
+        else
+            if SWS1 == 3
+                    %-- in CIM the busFrequency Deviation is selected, we are using the rotor speed deviation (W-1) instead of it
+                g06 = VIN1 - (W-1) 
+            else
+                if SWS1 == 4 
+                        %-- Active Power (P), i.e. Generator Electrical Power
+                    g06 = VIN1 - P 
+                else
+                    if SWS1 == 5
+                            %-- in CIM the Generator Accelereting Power is selected, we are using the Active Power (P) instead of it
+                        g06 = VIN1 - P 
+                    else
+                        if SWS1 == 6
+                            g06 = VIN1 - VT
+                        else
+                            if SWS1 == 7
+                                g06 = VIN1 - derVT
+                            else
+                                if SWS1 == 9
+                                    g06 = VIN1 - IFD
+                                end
+                            end 
+                        end     
+                    end         
+                end
+            end
+        end
+    end         
+end
+%------------------
+g07 = VSS - limit(V4,LSMIN,LSMAX,1)
+%-----------------------
+if t < 0  
+    g10 = VPSS - VSS
+else
+    if ( VCL == 0 & VCU == 0 )
+        g10 = VPSS - VSS
+    else
+        if ( ev_VCU < 0 & ev_VCL > 0 )
+            g10 = VPSS - VSS
+        else
+            g10 = VPSS 
+        end
+    end
+end
+
+ev_VCL = (VT - VCL)
+ev_VCU = (VT - VCU)  
+
+
+%--------------------------------------------------------------------------
+h_equations:
+%--------------------------------------------------------------------------
+
+
+%--------------------------------------------------------------------------
+
+
+%--------------------------------------------------------------------------
+checklimits:
+%--------------------------------------------------------------------------
+
+%--------------------------------------------------------------------------
+checkparameters:
+%--------------------------------------------------------------------------
+if ( A2 == 0 )
+    print('A2 is ZERO, must STOP')
+    ERROR
+end
+%--------------------------
+if ( A4 == 0 )
+    print('A4 is ZERO, must STOP')
+    ERROR
+end
+%--------------------------
+if ( T6 == 0 )
+    print('T6 is ZERO, must STOP')
+    ERROR
+end

@@ -1,0 +1,33 @@
+%-----------------------
+definitions:
+%-----------------------
+dynamic_states Torder=1
+inputs P1=1 VQ1 W=1
+external_states TMECH=1 
+parameters LFTYPE Setpoint=1 angle0 STEP=1
+%-----------------------
+initializations:
+%----------------------- 
+%-----------------------
+f_equations:
+%----------------------- 
+if t < 0
+    if LFTYPE==0
+        dt(Torder) = VQ1 - Setpoint*sin(angle0)
+    elseif LFTYPE==1
+        dt(Torder) = P1 - Setpoint
+    elseif LFTYPE==2
+        dt(Torder) = P1 - Setpoint
+    end
+else
+    dt(Torder) = 0
+end
+
+%----------------------- 
+g_equations:
+%-----------------------
+g1= TMECH - (Torder * STEP ) 
+%-----------------------
+h_equations:
+%-----------------------
+

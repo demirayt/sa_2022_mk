@@ -1,0 +1,40 @@
+%----------------------- 
+definitions:
+%-----------------------
+inputs VD1=1 VQ1 VD2=1 VQ2 
+external_states ID1 IQ1 ID2 IQ2 
+internal_states FlxD FlxQ 
+internal_states VRD VRQ ILD ILQ 
+parameters Ra La ws Rinf
+%-----------------------
+initializations:
+%----------------------- 
+%-----------------------
+f_equations:
+%----------------------- 
+
+%----------------------- 
+g_equations:
+%-----------------------
+g1 = FlxD - ILD*La
+g2 = FlxQ - ILQ*La
+g4 = VRD - ID1*Ra
+g5 = VRQ - IQ1*Ra
+g7 = ID1 + ID2
+g8 = IQ1 + IQ2
+g10 = ILD - (ID1 - (VD1 - VD2 - VRD)/Rinf)
+g11 = ILQ - (IQ1 - (VQ1 - VQ2 - VRQ)/Rinf)
+g12 = ws*(VD1 - VD2 - VRD) + ws*FlxQ
+g13 = ws*(VQ1 - VQ2 - VRQ) - ws*FlxD
+
+%-----------------------
+h_equations:
+%-----------------------
+measurements:
+
+
+
+
+
+
+

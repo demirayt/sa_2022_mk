@@ -1,0 +1,67 @@
+VERSION=1
+%-------------------------------------------------------------------------- 
+definitions: 
+%--------------------------------------------------------------------------
+baseclass=TSMController
+controllertype=TURB
+%--------------------------------------------------------------------------
+dynamic_states dV3={initial=1,unit="",description="dynamic state",display=false}
+dynamic_states dV4={initial=0,unit="",description="dynamic state",display=false}
+%--------------------------------------------------------------------------
+inputs W={initial=1,unit="rad/s",description="rotor angular speed",display=true}
+inputs POREF={initial=0,unit="",description="active power reference",display=true}
+%--------------------------------------------------------------------------
+external_states PMECH={initial=1,unit="",description="mechanical power",display=true}
+%--------------------------------------------------------------------------
+internal_states V1={initial=0,unit="",description="internal state",display=false}
+internal_states V2={initial=0,unit="",description="internal state",display=false}
+internal_states V3={initial=1,unit="",description="internal state",display=false}
+internal_states V4={initial=0,unit="",description="internal state",display=false}
+%--------------------------------------------------------------------------
+parameters R={initial=0.05,unit="",description="",display=true}
+parameters T1={initial=0.5,unit="s",description="",display=true}
+parameters VMAX={initial=1,unit="",description="",display=true}
+parameters VMIN={initial=0,unit="",description="",display=true}
+parameters T2={initial=3,unit="s",description="",display=true}
+parameters T3={initial=10,unit="s",description="",display=true}
+parameters DT={initial=0,unit="",description="",display=true}
+parameters PSTEP={initial=0,unit="",description="",display=true}
+%--------------------------------------------------------------------------
+
+%--------------------------------------------------------------------------
+initializations:
+%-------------------------------------------------------------------------- 
+
+%--------------------------------------------------------------------------
+f_equations:
+%--------------------------------------------------------------------------
+
+%-------------------------------------------------------------------------- 
+g_equations:
+%--------------------------------------------------------------------------
+g01 = V3 - lag(V2,dV3,1.0,T1,VMIN,VMAX)
+g02 = V4 - leadlag(V3,dV4,1.0,T2,T3,none,none)
+g03 = V1 - (W-1)
+g04 = V2 - (POREF-V1)/R
+g05 = PMECH - (V4-V1*DT)
+
+%--------------------------------------------------------------------------
+h_equations:
+%--------------------------------------------------------------------------
+
+%--------------------------------------------------------------------------
+checklimits:
+%--------------------------------------------------------------------------
+
+%--------------------------------------------------------------------------
+checkparameters:
+%--------------------------------------------------------------------------
+if ( R == 0 )
+    print('R is ZERO, must STOP')
+    ERROR
+end
+%--------------------------
+%- if ( MWBASE < 0 || MWBASE > 0)
+%-   print('MWBASE must be ZERO, must STOP')
+%-    ERROR
+%- end

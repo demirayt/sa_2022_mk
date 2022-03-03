@@ -1,0 +1,60 @@
+VERSION=1
+%-------------------------------------------------------------------------- 
+definitions:
+%--------------------------------------------------------------------------
+dynamic_states ED0={initial=0,unit="pu",description="dynamic state",display=false}
+dynamic_states EQ0={initial=0,unit="pu",description="dynamic state",display=false}
+%--------------------------------------------------------------------------
+inputs VD1={initial=1,unit="pu",description="real-part of positive sequence voltage",display=true}
+inputs VQ1={initial=0,unit="pu",description="imaginary-part of positive sequence voltage",display=true}
+%--------------------------------------------------------------------------
+external_states ID1={initial=0,unit="pu",description="real-part of positive sequence current",display=true}
+external_states IQ1={initial=0,unit="pu",description="imaginary-part of positive sequence current",display=true}
+%--------------------------------------------------------------------------
+internal_states P1={initial=0,unit="pu",description="active power",display=true}
+internal_states Q1={initial=0,unit="pu",description="reactive power",display=true}
+%--------------------------------------------------------------------------
+parameters Vmag0={initial=1,unit="rad",description="initial voltage magnitude",display=true}
+parameters Vang0={initial=0,unit="pu",description="initial voltage angle",display=true}
+parameters R={initial=0,unit="pu",description="resistance",display=true}
+parameters X={initial=0,unit="pu",description="inductance",display=true}
+parameters P0={initial=0,unit="pu",description="active power",display=true}
+parameters Q0={initial=0,unit="pu",description="reactive power",display=true}
+parameters LFTYPE={initial=0,unit="integer",description="load flow type",display=true}
+parameters SIDE1_ON={initial=1,unit="pu",description="Switching on/off at side 1(SIDE1_ON=1/SIDE1_ON=0)",display=true}
+parameters VFACTOR={initial=1,unit="pu",description="voltage factor",display=true}
+parameters IDEAL={initial=0,unit="boolean",description="ideal element",display=true}
+%--------------------------------------------------------------------------
+initializations:
+%--------------------------------------------------------------------------
+
+%--------------------------------------------------------------------------
+f_equations:
+%-------------------------------------------------------------------------- 
+if t < 0
+    if LFTYPE < 0.5
+        dt(ED0) = VD1 - Vmag0*cos(Vang0/180*pi)
+        dt(EQ0) = VQ1 - Vmag0*sin(Vang0/180*pi)
+    else
+        dt(ED0) = P1 - P0
+        dt(EQ0) = Q1 - Q0
+    end
+else
+    dt(ED0) = 0
+    dt(EQ0) = 0
+end
+%-------------------------------------------------------------------------- 
+g_equations:
+%--------------------------------------------------------------------------
+if IDEAL < 0.5
+    g1 = SIDE1_ON*(VD1*R+VQ1*X-ED0*VFACTOR*R-EQ0*VFACTOR*X)/(R^2+X^2) - ID1
+    g2 = SIDE1_ON*(-VD1*X+VQ1*R+ED0*VFACTOR*X-EQ0*VFACTOR*R)/(R^2+X^2) - IQ1
+else
+    g1 = SIDE1_ON*(VD1-ED0*VFACTOR) + (1-SIDE1_ON)*ID1
+    g2 = SIDE1_ON*(VQ1-EQ0*VFACTOR) + (1-SIDE1_ON)*IQ1
+end
+g3 = P1 - (VD1*ID1+VQ1*IQ1)
+g4 = Q1 - (VQ1*ID1-VD1*IQ1)
+%--------------------------------------------------------------------------
+h_equations:
+%--------------------------------------------------------------------------

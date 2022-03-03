@@ -1,0 +1,39 @@
+VERSION=1
+%-------------------------------------------------------------------------- 
+definitions:
+%--------------------------------------------------------------------------
+dynamic_states dIPCMD={initial=1,unit="",description="dynamic state",display=false}
+%--------------------------------------------------------------------------
+inputs VQ={initial=0,unit="",description="input",display=true}
+inputs P={initial=0,unit="",description="input",display=true}
+%--------------------------------------------------------------------------
+external_states IPCMD={initial=0.1,unit="",description="current source controlling the active power",display=true}
+%--------------------------------------------------------------------------
+parameters LFTYPE={initial=1,unit="",description="set point",display=true}
+parameters Psetpoint={initial=1,unit="",description="set point",display=true}
+parameters VQsetpoint={initial=0,unit="",description="set point",display=true}
+parameters K={initial=1,unit="",description="set point",display=true}
+%--------------------------------------------------------------------------
+initializations:
+%-------------------------------------------------------------------------- 
+
+%--------------------------------------------------------------------------
+f_equations:
+%-------------------------------------------------------------------------- 
+if t < 0
+	if (LFTYPE==3)
+		dt(dIPCMD) = (VQ - VQsetpoint)
+	else
+		dt(dIPCMD) = (P - Psetpoint)
+	end
+else
+    dt(dIPCMD) = 0;
+end
+
+%-------------------------------------------------------------------------- 
+g_equations:
+%--------------------------------------------------------------------------
+g1 = IPCMD - K*dIPCMD
+%--------------------------------------------------------------------------
+h_equations:
+%--------------------------------------------------------------------------

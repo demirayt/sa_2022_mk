@@ -1,0 +1,58 @@
+VERSION=1
+%--------------------------------------------------------------------------
+definitions:
+%--------------------------------------------------------------------------
+inputs VD1={initial=1,unit="pu",description="real-part of positive sequence voltage at side 1",display=true}
+inputs VQ1={initial=0,unit="pu",description="imaginary-part of positive sequence voltage at side 1",display=true}
+inputs VD2={initial=1,unit="pu",description="real-part of positive sequence voltage at side 2",display=true}
+inputs VQ2={initial=0,unit="pu",description="imaginary-part of positive sequence voltage at side 2",display=true}
+%--------------------------------------------------------------------------
+external_states ID1={initial=0,unit="pu",description="real-part of positive sequence current at side 1",display=true}
+external_states IQ1={initial=0,unit="pu",description="imaginary-part of positive sequence current at side 1",display=true}
+external_states ID2={initial=0,unit="pu",description="real-part of positive sequence current at side 2",display=true}
+external_states IQ2={initial=0,unit="pu",description="imaginary-part of positive sequence current at side 2",display=true}
+%--------------------------------------------------------------------------
+parameters R={initial=0,unit="pu",description="resistance",display=true}
+parameters X={initial=0,unit="pu",description="inductance",display=true}
+parameters B={initial=0,unit="pu",description="susceptance",display=true}
+parameters SIDE1_ON={initial=1,unit="pu",description="Switching on/off at side 1(SIDE1_ON=1/SIDE1_ON=0)",display=true}
+parameters SIDE2_ON={initial=1,unit="pu",description="Switching on/off at side 2(SIDE2_ON=1/SIDE2_ON=0)",display=true}
+%--------------------------------------------------------------------------
+initializations:
+%--------------------------------------------------------------------------
+ 
+%--------------------------------------------------------------------------
+f_equations:
+%--------------------------------------------------------------------------
+ 
+%-------------------------------------------------------------------------- 
+g_equations:
+%--------------------------------------------------------------------------
+if SIDE1_ON > 0.5 & SIDE2_ON > 0.5
+    g1 = (B*VQ1*R^2+B*VQ1*X^2+ID1*R^2-VD1*R+VD2*R+ID1*X^2-VQ1*X+VQ2*X)/(R^2+X^2)
+    g2 = (-B*VD1*R^2-B*VD1*X^2+IQ1*R^2+IQ1*X^2+VD1*X-VQ1*R-VD2*X+VQ2*R)/(R^2+X^2)
+    g3 = (ID2*R^2+ID2*X^2+VD1*R-VD2*R+VQ1*X-VQ2*X+B*VQ2*R^2+B*VQ2*X^2)/(R^2+X^2)
+    g4 = (IQ2*R^2+IQ2*X^2-VD1*X+VQ1*R+VD2*X-VQ2*R-B*VD2*R^2-B*VD2*X^2)/(R^2+X^2)
+else
+    if SIDE1_ON > 0.5 & SIDE2_ON < 0.5
+        g1 = ID1-VD1*B^2*R/(R^2*B^2+X^2*B^2-2*X*B+1)-VQ1/(R^2*B^2+X^2*B^2-2*X*B+1)*B^2*X+VQ1/(R^2*B^2+X^2*B^2-2*X*B+1)*B+B*VQ1
+        g2 = -VQ1*B^2*R/(R^2*B^2+X^2*B^2-2*X*B+1)-B*VD1-VD1/(R^2*B^2+X^2*B^2-2*X*B+1)*B+VD1/(R^2*B^2+X^2*B^2-2*X*B+1)*B^2*X+IQ1
+        g3 = ID2
+        g4 = IQ2
+    else
+	    if SIDE1_ON < 0.5 & SIDE2_ON > 0.5
+             g1 = ID1
+             g2 = IQ1
+             g3 = ID2-VD2*B^2*R/(R^2*B^2+X^2*B^2-2*X*B+1)-VQ2/(R^2*B^2+X^2*B^2-2*X*B+1)*B^2*X+VQ2/(R^2*B^2+X^2*B^2-2*X*B+1)*B+B*VQ2
+             g4 = IQ2-VQ2*B^2*R/(R^2*B^2+X^2*B^2-2*X*B+1)-VD2/(R^2*B^2+X^2*B^2-2*X*B+1)*B+VD2/(R^2*B^2+X^2*B^2-2*X*B+1)*B^2*X-B*VD2
+	    else
+            g1 = ID1
+            g2 = IQ1
+            g3 = ID2
+            g4 = IQ2
+	    end
+    end
+end
+%--------------------------------------------------------------------------
+h_equations:
+%--------------------------------------------------------------------------

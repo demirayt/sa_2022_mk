@@ -1,0 +1,34 @@
+%----------------------- 
+definitions:
+%-----------------------
+dynamic_states  V0=1
+inputs VD1=1 VQ1 VT=1 
+external_states  ID1 IQ1 P1=1 Q1
+parameters P0=1 Q0 DP QP alpha=2 beta=2 SIDE1_ON=1
+%-----------------------
+initializations:
+%----------------------- 
+%-----------------------
+f_equations:
+%----------------------- 
+if t < 0
+    dt(V0) = V0 - VT 
+else
+    dt(V0) = 0
+end
+%----------------------- 
+g_equations:
+%-----------------------
+if t <  0 
+    g1 = SIDE1_ON*P0*(1+DP) - P1
+    g2 = SIDE1_ON*Q0*(1+QP) - Q1
+else
+    g1 = SIDE1_ON*P0*(1+DP)*(VT/V0)^alpha - P1
+    g2 = SIDE1_ON*Q0*(1+QP)*(VT/V0)^beta  - Q1
+end
+g3 = ID1*VT^2 - (VD1*P1+VQ1*Q1)
+g4 = IQ1*VT^2 - (-Q1*VD1+VQ1*P1)
+
+
+%-----------------------
+h_equations:

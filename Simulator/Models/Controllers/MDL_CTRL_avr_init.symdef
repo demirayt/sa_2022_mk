@@ -1,0 +1,30 @@
+%----------------------- 
+definitions:
+%-----------------------
+dynamic_states dEFD=1
+inputs VT=1 Q1
+external_states EFD=1
+parameters LFTYPE=1 setpoint=1 STEP=1
+%-----------------------
+initializations:
+%----------------------- 
+%-----------------------
+f_equations:
+%----------------------- 
+if t < 0
+    if LFTYPE==0
+        dt(dEFD) = VT - setpoint
+    elseif LFTYPE==1
+        dt(dEFD) = VT - setpoint
+    elseif LFTYPE==2
+        dt(dEFD) = Q1 - setpoint
+    end
+else
+    dt(dEFD) = 0
+end
+%----------------------- 
+g_equations:
+%-----------------------
+g1= EFD - (dEFD * STEP)
+%-----------------------
+h_equations:
