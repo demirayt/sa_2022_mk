@@ -1,0 +1,36 @@
+%----------------------- 
+definitions:
+%-----------------------
+dynamic_states s v   
+%-----------------------
+parameters  r=0.9 v0 s0 pos2=1.5 g=9.81  
+events -!ev_displacement  +!ev_displacement2
+%-----------------------
+initializations:
+%----------------------- 
+
+%-----------------------
+f_equations:
+%----------------------- 
+if t < 0
+	dt(v) = v - v0
+	dt(s) = s - s0
+else
+	dt(v) = -g
+	dt(s) = v
+end
+%----------------------- 
+g_equations:
+%-----------------------
+ev_displacement = s
+ev_displacement2 = s - pos2
+%----------------------- 
+h_equations:
+%----------------------- 
+if ev_displacement==0
+	v+ = -r*v
+end
+
+if ev_displacement2==0
+	v+ = -r*v
+end
