@@ -4,7 +4,7 @@ definitions:
 dynamic_states dTstart xTIME STATUS
 internal_states TIME
 external_states y1=1 y2=0
-events +!ev_on 
+events +!ev_on -!ytoff
 parameters Ton=2 A=1 Toff=1 
 parameters minval maxval minout maxout
 %--------------------------------------------------------------------------
@@ -25,10 +25,11 @@ end
 g_equations:
 %--------------------------------------------------------------------------
 ev_on = (TIME - Ton)
+ytoff = A - y1
 if t < 0
 	y1 = 0
 else
-	y1 = STATUS*( K * sin( 2*pi/T*(TIME - Ton) ) )
+	y1 = xTIME 
 end
 TIME = xTIME 
 y2 = relay(y1,minval,maxval,minout,maxout)
@@ -39,4 +40,6 @@ h_equations:
 if ev_on == 0
     dTstart+ = TIME
     STATUS+ = 1
+if ytoff == 0
+    y1+ = -xTIME 	
 end
