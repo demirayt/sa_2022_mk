@@ -40,6 +40,10 @@ h_equations:
 if ev_on == 0
     dTstart+ = TIME
     STATUS+ = 1
+end
 if ytoff == 0
-    y1+ = -xTIME 	
+    y1+ = -xTIME
+end
+if y1 == 0
+    y1+ = xTIME
 end
