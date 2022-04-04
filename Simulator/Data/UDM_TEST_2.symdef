@@ -1,11 +1,10 @@
 %--------------------------------------------------------------------------
 definitions:
 %--------------------------------------------------------------------------
-dynamic_states dTstart xTIME STATUS
-internal_states TIME
+dynamic_states M S=0 Status xTime
 external_states y1=1 y2=0
-events +!ev_on -!ytoff
-parameters Ton=2 A=1 Toff=1 
+events -!ev_yab -!ev_yauf +!ev_on
+parameters ymax=1 ymin=0 Ton=1 m_auf=1 m_ab=-1
 parameters minval maxval minout maxout
 %--------------------------------------------------------------------------
 initializations:
@@ -13,37 +12,38 @@ initializations:
  
 %--------------------------------------------------------------------------
 f_equations:
-%--------------------------------------------------------------------------
-dt(dTstart) = 0 
-dt(STATUS) = 0
+%-------------------------------------------------------------------------- 
+dt(S)=0
+dt(Status) = 0
 if t < 0
-	dt(xTIME) = 0
+	dt(M) = 0
+	dt(xTime) = 0
 else
-	dt(xTIME) = 1
+	dt(M) = S
+	dt(xTime) = 1
 end
 %-------------------------------------------------------------------------- 
 g_equations:
 %--------------------------------------------------------------------------
-ev_on = (TIME - Ton)
-ytoff = A - y1
+ev_on = xTime - Ton
+ev_yauf = ymin - M
+ev_yab = ymax - M
 if t < 0
 	y1 = 0
 else
-	y1 = xTIME 
+	y1 = Status * M
 end
-TIME = xTIME 
 y2 = relay(y1,minval,maxval,minout,maxout)
-
 %--------------------------------------------------------------------------
 h_equations:
 %--------------------------------------------------------------------------
 if ev_on == 0
-    dTstart+ = TIME
-    STATUS+ = 1
+	Status+ = 1
+    S+ = m_auf
 end
-if ytoff == 0
-    y1+ = -xTIME
+if ev_yab == 0
+    S+ = m_ab
 end
-if y1 == 0
-    y1+ = xTIME
+if ev_yauf == 0
+    S+ = m_auf
 end
