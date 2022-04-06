@@ -129,7 +129,7 @@ elseif flag == 110
 	res = [1  1  1  1  1  1  1];
 return;
 elseif flag == 111
-	res = [1  1  1  1  1  1  1];
+	res = [1  1  1 -1 -1  1  1];
 return;
 elseif flag == 106
 Ton = param(1);

@@ -4,7 +4,7 @@ definitions:
 dynamic_states dTstart xTIME STATUS dPloss Counter1 Counter2 CounterStatus1 CounterStatus2
 internal_states TIME
 external_states y1=1 y2=0
-events +!ev_on +!ev_Stufe1 +!ev_Stufe2 +!ev_Stufe1n +!ev_Stufe2n +!ev_Zeit1 +!ev_Zeit2
+events +!ev_on +!ev_Stufe1 +!ev_Stufe2 -!ev_Stufe1n -!ev_Stufe2n +!ev_Zeit1 +!ev_Zeit2
 parameters Ton=1 K=0.5 T=2 Ts1=0.2 Ts2=0.2 df1=0.2 df2=0.4 
 %--------------------------------------------------------------------------
 initializations:
