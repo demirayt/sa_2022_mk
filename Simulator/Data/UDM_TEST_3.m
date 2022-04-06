@@ -129,7 +129,7 @@ elseif flag == 110
 	res = [1  1  1  1  1  1  1];
 return;
 elseif flag == 111
-	res = [0  0  0  0  0  0  0];
+	res = [1  1  1  1  1  1  1];
 return;
 elseif flag == 106
 Ton = param(1);
@@ -277,12 +277,20 @@ if (ev==2)
 res(5) = 0;
 res(7) = 1;
 end
+if (ev==4)
+res(5) = 0;
+res(7) = 1;
+end
 if (ev==6)
 res(5) = 0;
 res(7) = 0;
 res(4) = dPloss + 1/20;
 end
 if (ev==3)
+res(6) = 0;
+res(8) = 1;
+end
+if (ev==5)
 res(6) = 0;
 res(8) = 1;
 end
@@ -299,10 +307,14 @@ if (ev==1)
 end
 if (ev==2)
 end
+if (ev==4)
+end
 if (ev==6)
 res = [res;[4 4 (1)]];
 end
 if (ev==3)
+end
+if (ev==5)
 end
 if (ev==7)
 res = [res;[4 4 (1)]];
@@ -316,9 +328,13 @@ res = [res;[1 1 (1)]];
 end
 if (ev==2)
 end
+if (ev==4)
+end
 if (ev==6)
 end
 if (ev==3)
+end
+if (ev==5)
 end
 if (ev==7)
 end

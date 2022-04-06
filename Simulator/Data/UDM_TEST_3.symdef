@@ -54,12 +54,20 @@ if ev_Stufe1 == 0
 	Counter1+ = 0
 	CounterStatus1+ = 1
 end
+if ev_Stufe1n == 0
+	Counter1+ = 0
+	CounterStatus1+ = 1
+end
 if ev_Zeit1 == 0
 	Counter1+ = 0
 	CounterStatus1+ = 0
 	dPloss+ = dPloss + 0.05
 end
 if ev_Stufe2 == 0
+	Counter2+ = 0
+	CounterStatus2+ = 1
+end
+if ev_Stufe2n == 0
 	Counter2+ = 0
 	CounterStatus2+ = 1
 end
