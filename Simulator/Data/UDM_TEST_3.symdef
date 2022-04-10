@@ -1,10 +1,10 @@
 %--------------------------------------------------------------------------
 definitions:
 %--------------------------------------------------------------------------
-dynamic_states dTstart xTIME STATUS dPloss Counter1 Counter2 CounterStatus1 CounterStatus2
+dynamic_states dTstart xTIME STATUS dPloss Counter1 Counter2 Counter3 Counter4 CounterStatus1 CounterStatus2 CounterStatus3 CounterStatus4
 internal_states TIME
 external_states y1=1 y2=0
-events +!ev_on +!ev_Stufe1 +!ev_Stufe2 -!ev_Stufe1n -!ev_Stufe2n +!ev_Zeit1 +!ev_Zeit2
+events +!ev_on +!ev_Stufe1 +!ev_Stufe2 -!ev_Stufe1n -!ev_Stufe2n +!ev_Zeit1 +!ev_Zeit2 -!ev_Stufe3 +!ev_Stufe3n +!ev_Zeit3 -!ev_Stufe4 +!ev_Stufe4n +!ev_Zeit4
 parameters Ton=1 K=0.5 T=2 Ts1=0.2 Ts2=0.2 df1=0.2 df2=0.4 
 %--------------------------------------------------------------------------
 initializations:
@@ -20,6 +20,10 @@ dt(CounterStatus1) = 0
 dt(Counter1) = CounterStatus1
 dt(CounterStatus2) = 0 
 dt(Counter2) = CounterStatus2
+dt(CounterStatus3) = 0 
+dt(Counter3) = CounterStatus3
+dt(CounterStatus4) = 0 
+dt(Counter4) = CounterStatus4
 if t < 0
 	dt(xTIME) = 0
 else
@@ -33,8 +37,14 @@ ev_Stufe1 = (y1 - df1)
 ev_Stufe2 = (y1 - df2)
 ev_Stufe1n = (y1 + df1)
 ev_Stufe2n = (y1 + df2)
+ev_Stufe3 = (y1 - df1)
+ev_Stufe3n = (y1 + df1)
+ev_Stufe4 = (y1 - df2)
+ev_Stufe4n = (y1 + df2)
 ev_Zeit1 = (Counter1 - Ts1)
-ev_Zeit2 = (Counter2 - Ts2) 
+ev_Zeit2 = (Counter2 - Ts2)
+ev_Zeit3 = (Counter3 - Ts1)
+ev_Zeit4 = (Counter4 - Ts2)  
 if t < 0
 	y1 = 0
 else
@@ -75,4 +85,30 @@ if ev_Zeit2 == 0
 	Counter2+ = 0
 	CounterStatus2+ = 0
 	dPloss+ = dPloss + 0.1
+end
+if ev_Stufe3 == 0
+    Counter3+ = 0
+    CounterStatus3+ = 1
+end
+if ev_Stufe3n == 0
+	Counter3+ = 0
+	CounterStatus3+ = 1
+end
+if ev_Zeit3 == 0
+	Counter3+ = 0
+	CounterStatus3+ = 0
+	dPloss+ = dPloss - 0.05
+end
+if ev_Stufe4 == 0
+    Counter4+ = 0
+    CounterStatus4+ = 1
+end
+if ev_Stufe4n == 0
+	Counter4+ = 0
+	CounterStatus4+ = 1
+end
+if ev_Zeit4 == 0
+	Counter4+ = 0
+	CounterStatus4+ = 0
+	dPloss+ = dPloss - 0.1
 end
