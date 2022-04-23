@@ -209,7 +209,11 @@ res(6) = Ts2 - Counter2 + ev_Zeit2;
 res(7) = Ts2 - Counter3 + ev_Zeit3;
 res(8) = Ts1 - Counter4 + ev_Zeit4;
 
-res(9) = du1 - u1;
+if (t < 0.149332) 
+res(9) = du1 - 1;
+else
+res(9) = du1 - u1 + 1/5000;
+end
 
 res(10) = y2 - dPloss;
 
@@ -223,6 +227,9 @@ res = [res;[6 3 (-1)]];
 res = [res;[7 6 (-1)]];
 res = [res;[8 7 (-1)]];
 
+if (t < 0.149332) 
+else
+end
 
 res = [res;[10 1 (-1)]];
 
@@ -244,8 +251,12 @@ res = [res;[6 7 (1)]];
 res = [res;[7 10 (1)]];
 res = [res;[8 11 (1)]];
 
+if (t < 0.149332) 
+res = [res;[9 2 (1)]];
+else
 res = [res;[9 1 (-1)]];
 res = [res;[9 2 (1)]];
+end
 
 res = [res;[10 3 (1)]];
 

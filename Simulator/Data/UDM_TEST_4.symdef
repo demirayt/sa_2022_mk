@@ -38,7 +38,11 @@ ev_Zeit2 = (Counter2 - Ts2)
 ev_Zeit3 = (Counter3 - Ts2)
 ev_Zeit4 = (Counter4 - Ts1)
 
-du1 = u1
+if t < 0.149332
+    du1 = 1
+else
+    du1 = (u1 - 0.0002)
+end
 
 y2 = dPloss
 
