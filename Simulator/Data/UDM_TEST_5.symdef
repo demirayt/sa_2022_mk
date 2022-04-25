@@ -1,0 +1,88 @@
+%--------------------------------------------------------------------------
+definitions:
+%--------------------------------------------------------------------------
+dynamic_states xTrigger1 xTrigger2
+dynamic_states Counter1 Counter2 CounterStatus1 CounterStatus2
+dynamic_states Counter3 Counter4 CounterStatus3 CounterStatus4
+inputs u1=1
+internal_states du1
+external_states yTrigger1 yTrigger2
+events -!ev_Stufe1 -!ev_Stufe2 +!ev_Zeit1 +!ev_Zeit2
+events +!ev_Stufe3 +!ev_Stufe4 +!ev_Zeit3 +!ev_Zeit4
+parameters Ts1=0.2 Ts2=0.2 df1=0.2 df2=0.4 
+%--------------------------------------------------------------------------
+initializations:
+%--------------------------------------------------------------------------
+ 
+%--------------------------------------------------------------------------
+f_equations:
+%--------------------------------------------------------------------------
+dt(xTrigger1) = 0
+dt(xTrigger2) = 0
+dt(CounterStatus1) = 0 
+dt(Counter1) = CounterStatus1
+dt(CounterStatus2) = 0 
+dt(Counter2) = CounterStatus2
+dt(CounterStatus3) = 0 
+dt(Counter3) = CounterStatus3
+dt(CounterStatus4) = 0 
+dt(Counter4) = CounterStatus4
+
+%-------------------------------------------------------------------------- 
+g_equations:
+%--------------------------------------------------------------------------
+ev_Stufe1 = (du1 - df2)
+ev_Stufe2 = (du1 - df1)
+ev_Stufe3 = (du1 - df2)
+ev_Stufe4 = (du1 - df1)
+ev_Zeit1 = (Counter1 - Ts1)
+ev_Zeit2 = (Counter2 - Ts2)
+ev_Zeit3 = (Counter3 - Ts2)
+ev_Zeit4 = (Counter4 - Ts1)
+
+if t < 0
+    du1 = 1
+else
+    du1 = (u1 - 0.0002)
+end
+
+yTrigger1 = xTrigger1
+yTrigger2 = xTrigger2
+
+%--------------------------------------------------------------------------
+h_equations:
+%--------------------------------------------------------------------------
+if ev_Stufe1 == 0
+	Counter1+ = 0
+	CounterStatus1+ = 1
+end
+if ev_Zeit1 == 0
+	Counter1+ = 0
+	CounterStatus1+ = 0
+	xTrigger1+ = 1
+end
+if ev_Stufe2 == 0
+	Counter2+ = 0
+	CounterStatus2+ = 1
+end
+if ev_Zeit2 == 0
+	Counter2+ = 0
+	CounterStatus2+ = 0
+	xTrigger2+ = 1
+end
+if ev_Stufe3 == 0
+	Counter3+ = 0
+	CounterStatus3+ = 1
+end
+if ev_Zeit3 == 0
+	Counter3+ = 0
+	CounterStatus3+ = 0
+end
+if ev_Stufe4 == 0
+	Counter4+ = 0
+	CounterStatus4+ = 1
+end
+if ev_Zeit4 == 0
+	Counter4+ = 0
+	CounterStatus4+ = 0
+end

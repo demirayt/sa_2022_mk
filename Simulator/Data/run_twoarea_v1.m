@@ -13,12 +13,12 @@ simparam.bPlot = 1;
 simparam.everyNPoints = 50;
 simparam.RelTol = 1e-2;
 simparam.AbsTol = 1e-3;
-simparam.hmin = 1e-3;
+simparam.hmin = 1e-2;
 simparam.hmax = 5e-1;
 
 simparam.integ_type = enum_integ_type_trapezoidal;
-simparam.step_control = enum_variable_stepsize;
-%simparam.step_control = enum_fixed_stepsize;
+% simparam.step_control = enum_variable_stepsize;
+simparam.step_control = enum_fixed_stepsize;
 
 % figure
 % mdl = td_run_ps('data_case1_emt_dq0',simparam);
