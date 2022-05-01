@@ -126,8 +126,8 @@ res.y0(11) = 0; % ev_Zeit3
 res.y0(12) = 0; % ev_Zeit4 
 res.p0(1) = 2.000000e-01; % Ts1 
 res.p0(2) = 2.000000e-01; % Ts2 
-res.p0(3) = 2.000000e-01; % df1 
-res.p0(4) = 4.000000e-01; % df2 
+res.p0(3) = 4.000000e-01; % df1 
+res.p0(4) = 2.000000e-01; % df2 
 return;
 elseif flag == 110
 	res = [1  1  1  1  1  1  1  1];
@@ -217,11 +217,8 @@ res(6) = Ts2 - Counter2 + ev_Zeit2;
 res(7) = Ts2 - Counter3 + ev_Zeit3;
 res(8) = Ts1 - Counter4 + ev_Zeit4;
 
-if (t < 0) 
-res(9) = du1 - 1;
-else
-res(9) = du1 - u1 + 1/5000;
-end
+res(9) = du1 - u1;
+
 
 res(10) = yTrigger1 - xTrigger1;
 res(11) = yTrigger2 - xTrigger2;
@@ -236,9 +233,7 @@ res = [res;[6 4 (-1)]];
 res = [res;[7 7 (-1)]];
 res = [res;[8 8 (-1)]];
 
-if (t < 0) 
-else
-end
+
 
 res = [res;[10 1 (-1)]];
 res = [res;[11 2 (-1)]];
@@ -261,12 +256,9 @@ res = [res;[6 8 (1)]];
 res = [res;[7 11 (1)]];
 res = [res;[8 12 (1)]];
 
-if (t < 0) 
-res = [res;[9 2 (1)]];
-else
 res = [res;[9 1 (-1)]];
 res = [res;[9 2 (1)]];
-end
+
 
 res = [res;[10 3 (1)]];
 res = [res;[11 4 (1)]];

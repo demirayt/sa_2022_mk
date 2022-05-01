@@ -9,7 +9,7 @@ internal_states du1
 external_states yTrigger1 yTrigger2
 events -!ev_Stufe1 -!ev_Stufe2 +!ev_Zeit1 +!ev_Zeit2
 events +!ev_Stufe3 +!ev_Stufe4 +!ev_Zeit3 +!ev_Zeit4
-parameters Ts1=0.2 Ts2=0.2 df1=0.2 df2=0.4 
+parameters Ts1=0.2 Ts2=0.2 df1=0.4 df2=0.2
 %--------------------------------------------------------------------------
 initializations:
 %--------------------------------------------------------------------------
@@ -40,11 +40,8 @@ ev_Zeit2 = (Counter2 - Ts2)
 ev_Zeit3 = (Counter3 - Ts2)
 ev_Zeit4 = (Counter4 - Ts1)
 
-if t < 0
-    du1 = 1
-else
-    du1 = (u1 - 0.0002)
-end
+du1 = u1
+
 
 yTrigger1 = xTrigger1
 yTrigger2 = xTrigger2
