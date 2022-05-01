@@ -1,7 +1,7 @@
 %--------------------------------------------------------------------------
 definitions:
 %--------------------------------------------------------------------------
-dynamic_states xTrigger1 xTrigger2 Sperrcounter Sperrstatus Sperre=1
+dynamic_states xTrigger1 xTrigger2 Sperrcounter Sperrstatus=0 Sperre=1
 dynamic_states Counter1 Counter2 CounterStatus1 CounterStatus2
 inputs u1=1
 internal_states du1
@@ -37,9 +37,8 @@ ev_Sperre = (Sperrcounter - Sperrzeit)
 
 du1 = u1
 
-
-yTrigger1 = Sperre * xTrigger1
-yTrigger2 = Sperre * xTrigger2
+yTrigger1 = Sperre*xTrigger1
+yTrigger2 = Sperre*xTrigger2
 
 %--------------------------------------------------------------------------
 h_equations:
@@ -69,5 +68,5 @@ if ev_Zeit2 == 0
     Sperre+ = 0
 end
 if ev_Sperre == 0
-    Sperre = 1
+    Sperre+ = 1
 end
