@@ -31,8 +31,8 @@ dt(Counter4) = CounterStatus4
 %-------------------------------------------------------------------------- 
 g_equations:
 %--------------------------------------------------------------------------
-ev_Stufe1 = (du1 - df2)
-ev_Stufe2 = (du1 - df1)
+ev_Stufe1 = (du1 - df1)
+ev_Stufe2 = (du1 - df2)
 ev_Stufe3 = (du1 - df2)
 ev_Stufe4 = (du1 - df1)
 ev_Zeit1 = (Counter1 - Ts1)

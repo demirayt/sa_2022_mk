@@ -208,8 +208,8 @@ elseif flag == 4
 %----- g 
 res = empty;
 %--------------------------------------------------------------------------
-res(1) = df2 - du1 + ev_Stufe1;
-res(2) = df1 - du1 + ev_Stufe2;
+res(1) = df1 - du1 + ev_Stufe1;
+res(2) = df2 - du1 + ev_Stufe2;
 res(3) = df2 - du1 + ev_Stufe3;
 res(4) = df1 - du1 + ev_Stufe4;
 res(5) = Ts1 - Counter1 + ev_Zeit1;

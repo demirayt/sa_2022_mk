@@ -1,12 +1,9 @@
 %--------------------------------------------------------------------------
 definitions:
 %--------------------------------------------------------------------------
-dynamic_states xTrigger1 xTrigger2
-dynamic_states Counter1 Counter2 CounterStatus1 CounterStatus2
 inputs u1=1
-internal_states du1
+internal_states du1 Stufe1 Stufe2 xTrigger1 xTrigger2
 external_states yTrigger1 yTrigger2
-events -!ev_Stufe1 -!ev_Stufe2 +!ev_Zeit1 +!ev_Zeit2
 parameters Ts1=0.2 Ts2=0.2 df1=0.996 df2=0.994
 %--------------------------------------------------------------------------
 initializations:
@@ -15,45 +12,18 @@ initializations:
 %--------------------------------------------------------------------------
 f_equations:
 %--------------------------------------------------------------------------
-dt(xTrigger1) = 0
-dt(xTrigger2) = 0
-dt(CounterStatus1) = 0 
-dt(Counter1) = CounterStatus1
-dt(CounterStatus2) = 0 
-dt(Counter2) = CounterStatus2
 
 %-------------------------------------------------------------------------- 
 g_equations:
 %--------------------------------------------------------------------------
-ev_Stufe1 = (du1 - df2)
-ev_Stufe2 = (du1 - df1)
-ev_Zeit1 = (Counter1 - Ts1)
-ev_Zeit2 = (Counter2 - Ts2)
+g1 = Stufe1 - relay(du1,df1,df1,1,0)
+g2 = Stufe2 - relay(du1,df2,df2,1,0)
+g3 = xTrigger1 - pickup(Stufe1,Ts1)
+g4 = xTrigger2 - pickup(Stufe2,Ts2)
 
 du1 = u1
-
-
 yTrigger1 = xTrigger1
 yTrigger2 = xTrigger2
-
 %--------------------------------------------------------------------------
 h_equations:
 %--------------------------------------------------------------------------
-if ev_Stufe1 == 0
-    Counter1+ = 0
-    CounterStatus1+ = 1
-end
-if ev_Zeit1 == 0
-	Counter1+ = 0
-	CounterStatus1+ = 0
-	xTrigger1+ = 1
-end
-if ev_Stufe2 == 0
-    Counter2+ = 0
-    CounterStatus2+ = 1
-end
-if ev_Zeit2 == 0
-	Counter2+ = 0
-	CounterStatus2+ = 0
-	xTrigger2+ = 1
-end
